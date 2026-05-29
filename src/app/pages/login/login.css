@@ -4,11 +4,12 @@
 }
 
 .login {
-  --ink: #0c0b0a;
+  --dash-bg: #faf7f2;
+  --dash-text: #2a2118;
+  --dash-muted: #5c4e3d;
+  --dash-accent: #8a6b3a;
   --champagne: #c4a574;
   --champagne-light: #f5e6c8;
-  --burgundy: #5c2430;
-  --cream: #ede4d3;
 
   position: relative;
   min-height: 100dvh;
@@ -16,8 +17,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--dash-bg);
+  color: var(--dash-text);
   font-family: 'Syne', sans-serif;
 }
 
@@ -25,8 +26,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 90% 70% at 50% 50%, transparent 0%, rgba(12, 11, 10, 0.45) 100%),
-    linear-gradient(180deg, rgba(12, 11, 10, 0.15) 0%, rgba(12, 11, 10, 0.7) 100%);
+    radial-gradient(ellipse 90% 75% at 25% 20%, rgba(255, 252, 245, 0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(232, 213, 181, 0.35) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(255, 252, 247, 0.2) 0%, rgba(245, 235, 220, 0.15) 100%);
   pointer-events: none;
   z-index: 1;
 }
@@ -35,7 +37,7 @@
   position: absolute;
   width: clamp(72px, 12vw, 120px);
   height: clamp(72px, 12vw, 120px);
-  border: 1px solid rgba(196, 165, 116, 0.25);
+  border: 1px solid rgba(196, 165, 116, 0.35);
   z-index: 2;
   pointer-events: none;
 }
@@ -91,7 +93,7 @@
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(196, 165, 116, 0.85);
+  color: var(--dash-accent);
 }
 
 .login__eyebrow-line {
@@ -108,6 +110,7 @@
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.02em;
+  color: var(--dash-text);
 }
 
 .login__title-word {
@@ -120,7 +123,7 @@
 }
 
 .login__title-word:last-child {
-  color: var(--champagne);
+  color: var(--dash-accent);
   font-style: italic;
 }
 
@@ -129,7 +132,7 @@
   max-width: 32ch;
   font-size: clamp(0.95rem, 2.5vw, 1.05rem);
   line-height: 1.65;
-  color: rgba(237, 228, 211, 0.72);
+  color: var(--dash-muted);
 }
 
 .login__actions {
@@ -145,11 +148,12 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  border: none;
+  border: 1px solid rgba(138, 107, 58, 0.35);
   border-radius: 999px;
-  background: rgba(237, 228, 211, 0.06);
-  backdrop-filter: blur(12px);
-  color: var(--cream);
+  background: rgba(255, 252, 247, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--dash-text);
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
@@ -158,17 +162,19 @@
   transition:
     background 0.3s ease,
     transform 0.25s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    border-color 0.25s ease;
 }
 
 .login__button:hover:not(:disabled) {
-  background: rgba(237, 228, 211, 0.12);
+  background: rgba(255, 252, 247, 0.85);
+  border-color: rgba(138, 107, 58, 0.55);
   transform: translateY(-1px);
-  box-shadow: 0 12px 40px rgba(92, 36, 48, 0.35);
+  box-shadow: 0 12px 40px rgba(138, 107, 58, 0.14);
 }
 
 .login__button:focus-visible {
-  outline: 2px solid var(--champagne);
+  outline: 2px solid var(--dash-accent);
   outline-offset: 3px;
 }
 
@@ -188,7 +194,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(196, 165, 116, 0.5);
+  color: rgba(92, 78, 61, 0.65);
 }
 
 .login__showcase-tag {
@@ -197,7 +203,7 @@
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(196, 165, 116, 0.65);
+  color: var(--dash-accent);
 }
 
 .login__steps {
@@ -223,7 +229,7 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2rem, 5vw, 2.75rem);
   line-height: 1;
-  color: rgba(196, 165, 116, 0.35);
+  color: rgba(138, 107, 58, 0.35);
 }
 
 .login__step-title {
@@ -231,20 +237,20 @@
   font-size: clamp(0.92rem, 2.2vw, 1rem);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--cream);
+  color: var(--dash-text);
 }
 
 .login__step-text {
   margin: 0;
   font-size: clamp(0.85rem, 2vw, 0.92rem);
   line-height: 1.55;
-  color: rgba(237, 228, 211, 0.62);
+  color: var(--dash-muted);
 }
 
 .login__quote {
   margin: clamp(1.5rem, 4vw, 2.5rem) 0 0;
   padding: 1.25rem 0 0;
-  border-top: 1px solid rgba(196, 165, 116, 0.2);
+  border-top: 1px solid rgba(196, 165, 116, 0.28);
 }
 
 .login__quote p {
@@ -253,7 +259,7 @@
   font-size: clamp(1.1rem, 2.8vw, 1.35rem);
   font-style: italic;
   line-height: 1.45;
-  color: rgba(196, 165, 116, 0.75);
+  color: var(--dash-muted);
 }
 
 @keyframes blur-reveal {

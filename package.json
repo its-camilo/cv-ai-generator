@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "verify:gemini": "node scripts/verify-gemini.mjs",
+    "secrets:gemini": "bash scripts/set-gemini-secrets.sh",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

@@ -5,19 +5,20 @@
 }
 
 :root {
-  --ink: #0c0b0a;
+  --dash-bg: #faf7f2;
+  --dash-text: #2a2118;
+  --dash-muted: #5c4e3d;
+  --dash-accent: #8a6b3a;
   --champagne: #c4a574;
   --champagne-light: #f5e6c8;
-  --burgundy: #5c2430;
-  --cream: #ede4d3;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--dash-bg);
+  color: var(--dash-text);
   font-family: 'Syne', sans-serif;
 }
 

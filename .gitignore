@@ -26,7 +26,7 @@ yarn-error.log
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-!.vscode/mcp.json
+!.vscode/mcp.example.json
 .history/*
 
 # Miscellaneous
@@ -39,8 +39,26 @@ testem.log
 /typings
 __screenshots__/
 
-# Environment secrets
+# Environment & API keys (never commit real credentials)
+.env
+.env.*
+!.env.example
+
 /src/environments/environment.ts
+/src/environments/environment.development.ts
+/src/environments/environment.production.ts
+/src/environments/environment.local.ts
+
+# Local MCP / tool configs (may contain GEMINI_API_KEY and other secrets)
+.cursor/mcp.json
+!.cursor/mcp.example.json
+.vscode/mcp.json
+mcp.local.json
+**/mcp.local.json
+supabase/functions/.env
+secrets.json
+credentials.json
+*.pem
 
 # System files
 .DS_Store

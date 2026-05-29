@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "aistudio": {
+      "command": "npx",
+      "args": ["-y", "aistudio-mcp-server"],
+      "env": {
+        "GEMINI_API_KEY": "TU_GEMINI_API_KEY",
+        "GEMINI_MODEL": "gemini-3.1-flash-lite",
+        "GEMINI_TIMEOUT": "600000",
+        "GEMINI_MAX_OUTPUT_TOKENS": "16384",
+        "GEMINI_MAX_FILES": "10",
+        "GEMINI_MAX_TOTAL_FILE_SIZE": "50",
+        "GEMINI_TEMPERATURE": "0.2"
+      }
+    }
+  }
+}
