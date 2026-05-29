@@ -66,4 +66,44 @@ test.describe('CV layout — Globant AI Lead (EN)', () => {
     expect(skillsInsidePage).toBe(true);
     await expect(page.locator('.cv-doc__section-title', { hasText: 'SKILLS' })).toBeVisible();
   });
+
+  test('mobile mantiene proporción carta y tipografía sin comprimir', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/e2e/cv-layout?e2e=layout');
+    await page.waitForSelector('.cv-doc');
+
+    await page.waitForFunction(() => {
+      const wrap = document.querySelector('.cv-preview__paper-wrap') as HTMLElement | null;
+      const scale = wrap?.querySelector('.cv-preview__paper-scaler') as HTMLElement | null;
+      return !!scale && Number.parseFloat(getComputedStyle(scale).getPropertyValue('--paper-scale')) > 0;
+    });
+
+    const metrics = await page.evaluate(() => {
+      const doc = document.querySelector('.cv-doc') as HTMLElement;
+      const style = getComputedStyle(doc);
+      const rect = doc.getBoundingClientRect();
+      const scaler = document.querySelector('.cv-preview__paper-scaler') as HTMLElement;
+      const scale = Number.parseFloat(getComputedStyle(scaler).getPropertyValue('--paper-scale')) || 1;
+      const sheet = document.querySelector('.cv-doc__sheet') as HTMLElement;
+      const inner = doc.clientHeight - (Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom));
+
+      return {
+        fontSizePx: Number.parseFloat(style.fontSize),
+        layoutWidthPx: doc.clientWidth,
+        visualWidthPx: rect.width,
+        visualHeightPx: rect.height,
+        aspectRatio: rect.width / rect.height,
+        scale,
+        overflows: (sheet?.scrollHeight ?? 0) > inner + 1,
+      };
+    });
+
+    expect(metrics.fontSizePx).toBeGreaterThan(12.5);
+    expect(metrics.layoutWidthPx).toBeGreaterThan(800);
+    expect(metrics.aspectRatio).toBeCloseTo(8.5 / 11, 2);
+    expect(metrics.scale).toBeLessThan(1);
+    expect(metrics.scale).toBeGreaterThan(0.4);
+    expect(metrics.visualWidthPx).toBeLessThanOrEqual(392);
+    expect(metrics.overflows).toBe(false);
+  });
 });

@@ -11,9 +11,14 @@
     </header>
 
     <div class="cv-preview__layout">
-      <div class="cv-preview__paper-wrap">
-        <div #printRoot class="cv-preview__paper">
-          <app-cv-document [draft]="d" />
+      <div class="cv-preview__paper-wrap" #paperWrap>
+        <div
+          class="cv-preview__paper-scaler"
+          [style.--paper-scale]="paperScale()"
+        >
+          <div #printRoot class="cv-preview__paper">
+            <app-cv-document [draft]="d" />
+          </div>
         </div>
       </div>
 

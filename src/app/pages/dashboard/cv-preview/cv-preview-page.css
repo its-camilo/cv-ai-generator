@@ -47,8 +47,15 @@
 }
 
 .cv-preview__paper-wrap {
-  overflow-x: hidden;
+  overflow: hidden;
   padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.cv-preview__paper-scaler {
+  width: 100%;
+  max-width: 8.5in;
+  margin-inline: auto;
 }
 
 .cv-preview__paper {
@@ -56,6 +63,20 @@
   width: 100%;
   max-width: 8.5in;
   margin-inline: auto;
+}
+
+@media (max-width: 920px) {
+  .cv-preview__paper-scaler {
+    max-width: 100%;
+    height: calc(11in * var(--paper-scale, 1));
+  }
+
+  .cv-preview__paper {
+    width: 8.5in;
+    max-width: none;
+    transform: scale(var(--paper-scale, 1));
+    transform-origin: top center;
+  }
 }
 
 .cv-preview__editor {

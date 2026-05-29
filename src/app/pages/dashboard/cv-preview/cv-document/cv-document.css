@@ -205,20 +205,3 @@
     color: var(--cv-accent);
   }
 }
-
-@media (max-width: 920px) {
-  .cv-doc {
-    height: auto;
-    min-height: auto;
-    aspect-ratio: auto;
-    font-size: calc(9pt * var(--cv-tune-font));
-  }
-
-  .cv-doc__name {
-    font-size: calc(14pt * var(--cv-tune-font));
-  }
-
-  .cv-doc__sections--fill {
-    justify-content: flex-start;
-  }
-}

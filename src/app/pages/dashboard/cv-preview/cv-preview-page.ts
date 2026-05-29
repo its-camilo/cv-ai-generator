@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   inject,
   AfterViewInit,
@@ -27,6 +28,8 @@ import {
 import { createGlobantAiLeadE2eDraft } from '../../../core/testing/cv-e2e-fixture';
 import { CvDocument } from './cv-document/cv-document';
 
+const CV_PAGE_WIDTH_PX = 8.5 * 96;
+
 @Component({
   selector: 'app-cv-preview-page',
   imports: [RouterLink, CvDocument],
@@ -37,13 +40,16 @@ import { CvDocument } from './cv-document/cv-document';
 export class CvPreviewPage implements OnInit, AfterViewInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly draftService = inject(CvDraftService);
   private readonly cvGeneration = inject(CvGenerationService);
   private readonly pdfExport = inject(PdfExportService);
 
   readonly printRoot = viewChild<ElementRef<HTMLElement>>('printRoot');
+  readonly paperWrap = viewChild<ElementRef<HTMLElement>>('paperWrap');
 
   readonly draft = this.draftService.draft;
+  readonly paperScale = signal(1);
   readonly aiLoading = signal(false);
   readonly aiError = signal<string | null>(null);
   readonly downloadLoading = signal(false);
@@ -63,7 +69,23 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.setupPaperScale();
     void this.refinePageLayoutUntilStable();
+  }
+
+  private setupPaperScale(): void {
+    const wrap = this.paperWrap()?.nativeElement;
+    if (!wrap || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      const scale = width >= CV_PAGE_WIDTH_PX ? 1 : width / CV_PAGE_WIDTH_PX;
+      this.paperScale.set(scale);
+      this.cdr.markForCheck();
+    });
+
+    observer.observe(wrap);
+    this.destroyRef.onDestroy(() => observer.disconnect());
   }
 
   private loadLayoutE2eFixtureIfRequested(): void {
@@ -231,13 +253,19 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
     const exportEl = root.querySelector('.cv-doc') as HTMLElement | null;
     if (!exportEl) return;
 
+    const previousTransform = root.style.transform;
+    root.style.transform = 'none';
+
     this.downloadLoading.set(true);
     this.aiError.set(null);
     try {
+      this.cdr.detectChanges();
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
       await this.pdfExport.downloadElementAsPdf(exportEl, d.pdfFileName);
     } catch {
       this.aiError.set('No se pudo generar el PDF. Intenta de nuevo.');
     } finally {
+      root.style.transform = previousTransform;
       this.downloadLoading.set(false);
     }
   }
