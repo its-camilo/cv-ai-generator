@@ -1,59 +1,35 @@
 # CV AI Generator
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.13.
+Generador de CVs con IA que personaliza tu currículum para cada oferta de trabajo. Guardás un perfil maestro, pegás la descripción del puesto y obtenés un CV en español o inglés con vista previa y descarga en PDF.
 
-## Development server
+Construido con **Angular 21**, autenticación en **Supabase** y **Gemini** (Edge Function) para generar y ajustar cada sección. Incluye edición manual, regeneración selectiva con instrucciones y layout optimizado para móvil y carta US Letter.
 
-To start a local development server, run:
+**Producción:** [cv-ai-generator-rho.vercel.app](https://cv-ai-generator-rho.vercel.app)
 
-```bash
-ng serve
-```
+## Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular 21 (standalone, signals, reactive forms)
+- Supabase Auth
+- Gemini API (Supabase Edge Function)
+- html2canvas + jsPDF (exportación PDF)
+- Playwright (e2e)
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Desarrollo
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
+Abre [http://localhost:4200](http://localhost:4200).
 
-To build the project run:
+Variables de entorno en `src/environments/environment.ts` (no versionado). La clave de Gemini va en la Edge Function de Supabase, no en el frontend.
 
-```bash
-ng build
-```
+## Scripts
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Comando | Descripción |
+|---------|-------------|
+| `npm start` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm test` | Tests unitarios (Vitest) |
+| `npm run test:e2e:layout` | E2E de layout del CV (Playwright) |
