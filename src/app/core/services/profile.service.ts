@@ -112,8 +112,8 @@ export class ProfileService {
       perfil_id: perfilId,
       lugar: item.lugar.trim(),
       cargo: item.cargo.trim(),
-      fecha_inicio: item.fecha_inicio,
-      fecha_fin: item.fecha_fin || null,
+      fecha_inicio: item.fecha_inicio?.trim() || null,
+      fecha_fin: item.fecha_fin?.trim() || null,
       descripcion: item.descripcion?.trim() || null,
       orden,
     };
@@ -145,6 +145,20 @@ export class ProfileService {
     if (error) throw error;
   }
 
+  async reorderExperiencias(items: ExperienciaMaestra[]): Promise<void> {
+    const updates = items
+      .map((item, index) => ({ id: item.id, orden: index }))
+      .filter((item) => !item.id.startsWith('temp-'))
+      .map(({ id, orden }) =>
+        this.supabase.from('experiencias_maestras').update({ orden }).eq('id', id),
+      );
+
+    const results = await Promise.all(updates);
+    for (const { error } of results) {
+      if (error) throw error;
+    }
+  }
+
   async loadEducaciones(perfilId: string): Promise<EducacionMaestra[]> {
     const { data, error } = await this.supabase
       .from('educaciones_maestras')
@@ -165,8 +179,8 @@ export class ProfileService {
       perfil_id: perfilId,
       lugar: item.lugar.trim(),
       titulo: item.titulo.trim(),
-      fecha_inicio: item.fecha_inicio || null,
-      fecha_fin: item.fecha_fin || null,
+      fecha_inicio: item.fecha_inicio?.trim() || null,
+      fecha_fin: item.fecha_fin?.trim() || null,
       nota: item.nota?.trim() || null,
       orden,
     };
@@ -196,5 +210,19 @@ export class ProfileService {
     if (id.startsWith('temp-')) return;
     const { error } = await this.supabase.from('educaciones_maestras').delete().eq('id', id);
     if (error) throw error;
+  }
+
+  async reorderEducaciones(items: EducacionMaestra[]): Promise<void> {
+    const updates = items
+      .map((item, index) => ({ id: item.id, orden: index }))
+      .filter((item) => !item.id.startsWith('temp-'))
+      .map(({ id, orden }) =>
+        this.supabase.from('educaciones_maestras').update({ orden }).eq('id', id),
+      );
+
+    const results = await Promise.all(updates);
+    for (const { error } of results) {
+      if (error) throw error;
+    }
   }
 }

@@ -1,0 +1,44 @@
+<div class="generate-cv-page">
+  <header class="generate-cv-page__header">
+    <a routerLink="/dashboard" class="generate-cv-page__back">
+      <span class="generate-cv-page__back-arrow" aria-hidden="true">←</span>
+      Volver al dashboard
+    </a>
+
+    <div class="generate-cv-page__intro">
+      <p class="generate-cv-page__eyebrow">CV personalizado</p>
+      <h2 class="generate-cv-page__heading">Generar CV</h2>
+      <p class="generate-cv-page__subheading">
+        Revisa cada campo y descarga tu PDF.
+      </p>
+    </div>
+  </header>
+
+  <section class="generate-cv-page__panel" aria-labelledby="oferta-heading">
+    <h3 id="oferta-heading" class="generate-cv-page__panel-title">Oferta laboral</h3>
+    <p class="generate-cv-page__panel-desc">
+      Pega aquí el texto completo de la vacante. La IA lo usará para adaptar tu perfil.
+    </p>
+
+    <label class="generate-cv-page__label" for="oferta-texto">Texto de la oferta</label>
+    <textarea
+      id="oferta-texto"
+      class="generate-cv-page__textarea"
+      rows="14"
+      placeholder="Pega la descripción del puesto, requisitos, responsabilidades y cualquier detalle relevante de la vacante…"
+      [value]="ofertaTexto()"
+      (input)="updateOferta($any($event.target).value)"
+    ></textarea>
+
+    <div class="generate-cv-page__actions">
+      <button
+        type="button"
+        class="generate-cv-page__submit"
+        [disabled]="!ofertaTexto().trim()"
+        (click)="handleGenerate()"
+      >
+        Generar CV
+      </button>
+    </div>
+  </section>
+</div>

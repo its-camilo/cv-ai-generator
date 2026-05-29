@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DashboardHome } from './pages/dashboard/dashboard-home/dashboard-home';
 import { ProfilePage } from './pages/dashboard/profile-page/profile-page';
+import { GenerateCvPage } from './pages/dashboard/generate-cv-page/generate-cv-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -12,6 +13,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: DashboardHome },
       { path: 'perfil', component: ProfilePage },
+      { path: 'generar-cv', component: GenerateCvPage },
     ],
   },
   { path: '', redirectTo: '/login', pathMatch: 'full' },

@@ -1,4 +1,5 @@
 import { DecimalPipe } from '@angular/common';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -28,7 +29,7 @@ type PerfilField =
 
 @Component({
   selector: 'app-profile-form',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, DragDropModule],
   templateUrl: './profile-form.html',
   styleUrl: './profile-form.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,7 +96,7 @@ export class ProfileForm {
         perfil_id: null,
         lugar: '',
         cargo: '',
-        fecha_inicio: '',
+        fecha_inicio: null,
         fecha_fin: null,
         descripcion: null,
         orden: items.length,
@@ -115,7 +116,7 @@ export class ProfileForm {
     if (!perfil) return;
 
     const item = this.experiencias()[index];
-    if (!item?.lugar.trim() || !item.cargo.trim() || !item.fecha_inicio) return;
+    if (!item?.lugar.trim() || !item.cargo.trim()) return;
 
     const key = `exp.${item.id}`;
     await this.runSave(key, async () => {
@@ -132,6 +133,22 @@ export class ProfileForm {
     await this.runSave(key, async () => {
       await this.profileService.deleteExperiencia(item.id);
       this.experiencias.update((items) => items.filter((_, i) => i !== index));
+    });
+  }
+
+  async onExperienciaDrop(event: CdkDragDrop<ExperienciaMaestra[]>): Promise<void> {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const items = [...this.experiencias()];
+    moveItemInArray(items, event.previousIndex, event.currentIndex);
+    const reordered = items.map((item, index) => ({ ...item, orden: index }));
+    this.experiencias.set(reordered);
+
+    const savedItems = reordered.filter((item) => !item.id.startsWith('temp-'));
+    if (savedItems.length === 0) return;
+
+    await this.runSave('exp.reorder', async () => {
+      await this.profileService.reorderExperiencias(reordered);
     });
   }
 
@@ -180,6 +197,22 @@ export class ProfileForm {
     await this.runSave(key, async () => {
       await this.profileService.deleteEducacion(item.id);
       this.educaciones.update((items) => items.filter((_, i) => i !== index));
+    });
+  }
+
+  async onEducacionDrop(event: CdkDragDrop<EducacionMaestra[]>): Promise<void> {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const items = [...this.educaciones()];
+    moveItemInArray(items, event.previousIndex, event.currentIndex);
+    const reordered = items.map((item, index) => ({ ...item, orden: index }));
+    this.educaciones.set(reordered);
+
+    const savedItems = reordered.filter((item) => !item.id.startsWith('temp-'));
+    if (savedItems.length === 0) return;
+
+    await this.runSave('edu.reorder', async () => {
+      await this.profileService.reorderEducaciones(reordered);
     });
   }
 

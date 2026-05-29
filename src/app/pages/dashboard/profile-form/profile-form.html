@@ -227,7 +227,7 @@
         <div>
           <h3 id="section-exp" class="profile-form__section-title">Experiencia laboral</h3>
           <p class="profile-form__section-desc">
-            Misma estructura siempre. La IA adaptará la descripción según la oferta.
+            Misma estructura siempre. Arrastra las tarjetas para reordenarlas. Las fechas pueden ser texto libre.
           </p>
         </div>
         <button type="button" class="profile-form__add" (click)="addExperiencia()">
@@ -239,19 +239,36 @@
         <p class="profile-form__empty">Aún no hay experiencias. Añade la primera.</p>
       }
 
-      @for (exp of experiencias(); track exp.id; let i = $index) {
-        <article class="profile-form__card" [attr.aria-label]="'Experiencia ' + (i + 1)">
-          <div class="profile-form__card-top">
-            <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
-            <button
-              type="button"
-              class="profile-form__remove"
-              (click)="removeExperiencia(i)"
-              [attr.aria-label]="'Eliminar experiencia ' + (i + 1)"
-            >
-              Eliminar
-            </button>
-          </div>
+      <div
+        cdkDropList
+        class="profile-form__sortable-list"
+        (cdkDropListDropped)="onExperienciaDrop($event)"
+      >
+        @for (exp of experiencias(); track exp.id; let i = $index) {
+          <article
+            cdkDrag
+            class="profile-form__card profile-form__card--draggable"
+            [attr.aria-label]="'Experiencia ' + (i + 1)"
+          >
+            <div class="profile-form__card-top">
+              <button
+                type="button"
+                cdkDragHandle
+                class="profile-form__drag-handle"
+                [attr.aria-label]="'Reordenar experiencia ' + (i + 1)"
+              >
+                <span class="profile-form__drag-grip" aria-hidden="true"></span>
+              </button>
+              <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
+              <button
+                type="button"
+                class="profile-form__remove"
+                (click)="removeExperiencia(i)"
+                [attr.aria-label]="'Eliminar experiencia ' + (i + 1)"
+              >
+                Eliminar
+              </button>
+            </div>
 
           <div class="profile-form__grid profile-form__grid--2">
             <div class="profile-form__field">
@@ -283,9 +300,10 @@
               <input
                 [id]="'exp-inicio-' + i"
                 class="profile-form__input"
-                type="month"
-                [value]="exp.fecha_inicio"
-                (input)="updateExperiencia(i, 'fecha_inicio', $any($event.target).value)"
+                type="text"
+                placeholder="Ej. 2020, Ene 2021, en curso…"
+                [value]="exp.fecha_inicio ?? ''"
+                (input)="updateExperiencia(i, 'fecha_inicio', $any($event.target).value || null)"
                 (blur)="saveExperiencia(i)"
               />
             </div>
@@ -295,7 +313,8 @@
               <input
                 [id]="'exp-fin-' + i"
                 class="profile-form__input"
-                type="month"
+                type="text"
+                placeholder="Ej. 2023, Actualidad, presente…"
                 [value]="exp.fecha_fin ?? ''"
                 (input)="updateExperiencia(i, 'fecha_fin', $any($event.target).value || null)"
                 (blur)="saveExperiencia(i)"
@@ -331,6 +350,21 @@
           </span>
         </article>
       }
+      </div>
+
+      <span
+        class="profile-form__save profile-form__save--section"
+        [class.profile-form__save--saving]="fieldState('exp.reorder') === 'saving'"
+        [class.profile-form__save--saved]="fieldState('exp.reorder') === 'saved'"
+        [class.profile-form__save--error]="fieldState('exp.reorder') === 'error'"
+        aria-live="polite"
+      >
+        @switch (fieldState('exp.reorder')) {
+          @case ('saving') { Guardando orden… }
+          @case ('saved') { Orden guardado }
+          @case ('error') { Error al guardar orden }
+        }
+      </span>
     </section>
 
     <!-- Educación -->
@@ -339,7 +373,9 @@
         <span class="profile-form__section-num" aria-hidden="true">04</span>
         <div>
           <h3 id="section-edu" class="profile-form__section-title">Educación</h3>
-          <p class="profile-form__section-desc">Siempre la misma en cada CV.</p>
+          <p class="profile-form__section-desc">
+            Siempre la misma en cada CV. Arrastra las tarjetas para reordenarlas. Las fechas pueden ser texto libre.
+          </p>
         </div>
         <button type="button" class="profile-form__add" (click)="addEducacion()">
           + Añadir educación
@@ -350,19 +386,36 @@
         <p class="profile-form__empty">Aún no hay estudios registrados.</p>
       }
 
-      @for (edu of educaciones(); track edu.id; let i = $index) {
-        <article class="profile-form__card" [attr.aria-label]="'Educación ' + (i + 1)">
-          <div class="profile-form__card-top">
-            <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
-            <button
-              type="button"
-              class="profile-form__remove"
-              (click)="removeEducacion(i)"
-              [attr.aria-label]="'Eliminar educación ' + (i + 1)"
-            >
-              Eliminar
-            </button>
-          </div>
+      <div
+        cdkDropList
+        class="profile-form__sortable-list"
+        (cdkDropListDropped)="onEducacionDrop($event)"
+      >
+        @for (edu of educaciones(); track edu.id; let i = $index) {
+          <article
+            cdkDrag
+            class="profile-form__card profile-form__card--draggable"
+            [attr.aria-label]="'Educación ' + (i + 1)"
+          >
+            <div class="profile-form__card-top">
+              <button
+                type="button"
+                cdkDragHandle
+                class="profile-form__drag-handle"
+                [attr.aria-label]="'Reordenar educación ' + (i + 1)"
+              >
+                <span class="profile-form__drag-grip" aria-hidden="true"></span>
+              </button>
+              <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
+              <button
+                type="button"
+                class="profile-form__remove"
+                (click)="removeEducacion(i)"
+                [attr.aria-label]="'Eliminar educación ' + (i + 1)"
+              >
+                Eliminar
+              </button>
+            </div>
 
           <div class="profile-form__grid profile-form__grid--2">
             <div class="profile-form__field">
@@ -394,7 +447,8 @@
               <input
                 [id]="'edu-inicio-' + i"
                 class="profile-form__input"
-                type="month"
+                type="text"
+                placeholder="Ej. 2018, Ene 2019, en curso…"
                 [value]="edu.fecha_inicio ?? ''"
                 (input)="updateEducacion(i, 'fecha_inicio', $any($event.target).value || null)"
                 (blur)="saveEducacion(i)"
@@ -406,7 +460,8 @@
               <input
                 [id]="'edu-fin-' + i"
                 class="profile-form__input"
-                type="month"
+                type="text"
+                placeholder="Ej. 2022, Actualidad, presente…"
                 [value]="edu.fecha_fin ?? ''"
                 (input)="updateEducacion(i, 'fecha_fin', $any($event.target).value || null)"
                 (blur)="saveEducacion(i)"
@@ -441,6 +496,21 @@
           </span>
         </article>
       }
+      </div>
+
+      <span
+        class="profile-form__save profile-form__save--section"
+        [class.profile-form__save--saving]="fieldState('edu.reorder') === 'saving'"
+        [class.profile-form__save--saved]="fieldState('edu.reorder') === 'saved'"
+        [class.profile-form__save--error]="fieldState('edu.reorder') === 'error'"
+        aria-live="polite"
+      >
+        @switch (fieldState('edu.reorder')) {
+          @case ('saving') { Guardando orden… }
+          @case ('saved') { Orden guardado }
+          @case ('error') { Error al guardar orden }
+        }
+      </span>
     </section>
 
     <!-- Habilidades -->

@@ -17,7 +17,7 @@ export interface ExperienciaMaestra {
   perfil_id: string | null;
   lugar: string;
   cargo: string;
-  fecha_inicio: string;
+  fecha_inicio: string | null;
   fecha_fin: string | null;
   descripcion: string | null;
   orden: number | null;
