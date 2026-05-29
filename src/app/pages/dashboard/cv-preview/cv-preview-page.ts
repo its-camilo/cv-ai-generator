@@ -55,7 +55,7 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
     this.loadLayoutE2eFixtureIfRequested();
 
     if (!this.draftService.hasDraft()) {
-      void this.router.navigate(['/dashboard/generar-cv']);
+      void this.router.navigate(['/dashboard/generate-cv']);
       return;
     }
     this.normalizeDraftIfNeeded();

@@ -89,8 +89,8 @@
                 @if (formatEduDates(edu.fechaInicio, edu.fechaFin)) {
                   <p class="cv-doc__block-dates">{{ formatEduDates(edu.fechaInicio, edu.fechaFin) }}</p>
                 }
-                @if (edu.nota) {
-                  <p class="cv-doc__block-note">{{ edu.nota }}</p>
+                @if (educationNota(edu.nota)) {
+                  <p class="cv-doc__block-note">{{ educationNota(edu.nota) }}</p>
                 }
               </div>
             }

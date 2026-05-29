@@ -8,8 +8,8 @@
     <div class="generate-cv-page__intro">
       <p class="generate-cv-page__eyebrow">CV personalizado · Paso 1</p>
       <h2 class="generate-cv-page__heading">Generar CV</h2>
-      <p class="generate-cv-page__subheading">
-        Pega la oferta, elige idioma del CV y la IA adaptará todo el contenido al formato de 1 página (plantilla Camilo Lagos).
+      <p class="generate-cv-page__subheading generate-cv-page__subheading--single">
+        Pega la oferta, elige idioma del CV y la IA adaptará todo el contenido al formato de 1 página.
       </p>
     </div>
   </header>
@@ -17,8 +17,8 @@
   @if (user$ | async; as user) {
     <section class="generate-cv-page__panel" aria-labelledby="oferta-heading">
       <h3 id="oferta-heading" class="generate-cv-page__panel-title">Oferta laboral</h3>
-      <p class="generate-cv-page__panel-desc">
-        El resto de secciones (datos, experiencia, educación) se tomarán de tu perfil maestro.
+      <p class="generate-cv-page__panel-desc generate-cv-page__panel-desc--single">
+        Completa tu inventario una vez. La IA lo adaptará para cada oferta laboral.
       </p>
 
       <label class="generate-cv-page__label" for="oferta-texto">Texto de la oferta</label>
@@ -32,44 +32,43 @@
         (input)="updateOferta($any($event.target).value)"
       ></textarea>
 
-      <fieldset class="generate-cv-page__lang" [disabled]="generating()">
-        <legend class="generate-cv-page__label">Idioma del CV</legend>
-        <div class="generate-cv-page__lang-options">
+      @if (errorMessage(); as err) {
+        <div class="generate-cv-page__error" role="alert">{{ err }}</div>
+      }
+
+      <div class="generate-cv-page__toolbar">
+        <div
+          class="generate-cv-page__lang-options"
+          role="radiogroup"
+          aria-label="Idioma del CV"
+          [attr.aria-disabled]="generating()"
+        >
           <label class="generate-cv-page__lang-option">
             <input
+              class="generate-cv-page__lang-input"
               type="radio"
               name="cv-lang"
               value="es"
               [checked]="language() === 'es'"
+              [disabled]="generating()"
               (change)="setLanguage('es')"
             />
             <span>Español</span>
           </label>
           <label class="generate-cv-page__lang-option">
             <input
+              class="generate-cv-page__lang-input"
               type="radio"
               name="cv-lang"
               value="en"
               [checked]="language() === 'en'"
+              [disabled]="generating()"
               (change)="setLanguage('en')"
             />
             <span>English</span>
           </label>
         </div>
-      </fieldset>
 
-      @if (errorMessage(); as err) {
-        <div class="generate-cv-page__error" role="alert">{{ err }}</div>
-      }
-
-      @if (generating() && phaseMessage(); as msg) {
-        <p class="generate-cv-page__status" role="status" aria-live="polite">
-          <span class="generate-cv-page__status-dot" aria-hidden="true"></span>
-          {{ msg }}
-        </p>
-      }
-
-      <div class="generate-cv-page__actions">
         <button
           type="button"
           class="generate-cv-page__submit"
@@ -83,6 +82,13 @@
           }
         </button>
       </div>
+
+      @if (generating() && phaseMessage(); as msg) {
+        <p class="generate-cv-page__status" role="status" aria-live="polite">
+          <span class="generate-cv-page__status-dot" aria-hidden="true"></span>
+          {{ msg }}
+        </p>
+      }
     </section>
   }
 </div>

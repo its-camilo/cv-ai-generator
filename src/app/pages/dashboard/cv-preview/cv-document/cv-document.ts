@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { GeneratedCvDraft } from '../../../../core/models/cv.models';
+import { sanitizeEducationNota } from '../../../../core/utils/cv-validation';
 import { pageTuneStyleVars } from '../../../../core/utils/cv-page-tune';
 
 @Component({
@@ -73,5 +74,9 @@ export class CvDocument {
       .split(/\n+/)
       .map((line) => line.replace(/^[\s•●\-]+/, '').trim())
       .filter(Boolean);
+  }
+
+  educationNota(nota: string): string {
+    return sanitizeEducationNota(nota);
   }
 }

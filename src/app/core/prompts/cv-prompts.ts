@@ -140,6 +140,7 @@ Plantilla de referencia: CV de 1 página, Arial 10pt, secciones ${labels.sobreMi
 TODO el texto visible del CV debe estar en ${langLabel}.
 NO traduzcas: nombres propios de personas, URLs, correos, teléfonos, fechas (MM/YYYY), nombres oficiales de instituciones/empresas.
 SÍ traduce: carrera/título profesional, cargos, descripciones, títulos académicos/programas, notas (ej. GPA), prefijos de habilidades, "Actualidad"/"Present", niveles de idioma.
+Si no hay nota o GPA, deja "nota" como string vacío. NO uses "No aplica", "N/A" ni equivalentes.
 Habilidades: exactamente 3 líneas.
 - Línea 1: herramientas/metodologías sin prefijo.
 - Línea 2: prefijo "${language === 'es' ? 'Lenguajes de programación:' : 'Programming languages:'}".
@@ -254,12 +255,14 @@ export function buildDefaultPdfFileName(empresaSlug: string): string {
 
 export function splitNombreCompleto(nombreCompleto: string): { linea1: string; linea2: string } {
   const parts = nombreCompleto.trim().split(/\s+/).filter(Boolean);
-  if (parts.length <= 2) {
-    return { linea1: parts[0] ?? '', linea2: parts.slice(1).join(' ') };
+  if (parts.length <= 1) {
+    return { linea1: parts[0] ?? '', linea2: '' };
   }
+
+  const mid = Math.ceil(parts.length / 2);
   return {
-    linea1: parts.slice(0, -1).join(' '),
-    linea2: parts.at(-1) ?? '',
+    linea1: parts.slice(0, mid).join(' '),
+    linea2: parts.slice(mid).join(' '),
   };
 }
 

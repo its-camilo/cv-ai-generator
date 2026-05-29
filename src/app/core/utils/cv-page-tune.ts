@@ -1,4 +1,5 @@
 import { CV_LAYOUT } from '../constants/cv-layout.constants';
+import { sanitizeEducationNota } from './cv-validation';
 import type { CvPageTune, GeneratedCvDraft } from '../models/cv.models';
 
 export const DEFAULT_CV_PAGE_TUNE: CvPageTune = {
@@ -139,7 +140,7 @@ export function estimateDraftHeightIn(draft: GeneratedCvDraft, tune: CvPageTune)
       if (edu.fechaInicio || edu.fechaFin) {
         heightIn += ptIn(scaledPt(9, tune.fontScale));
       }
-      if (edu.nota.trim()) {
+      if (sanitizeEducationNota(edu.nota)) {
         heightIn += bodyLineIn;
       }
       heightIn += blockGapIn;

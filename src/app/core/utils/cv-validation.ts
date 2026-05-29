@@ -5,6 +5,16 @@ export interface CvValidationResult {
   errors: string[];
 }
 
+const EMPTY_EDUCATION_NOTA = /^(no\s+aplica|n\/a|na|not\s+applicable|none|sin\s+nota|—|-)$/i;
+
+export function sanitizeEducationNota(nota: string | null | undefined): string {
+  const trimmed = (nota ?? '').trim();
+  if (!trimmed || EMPTY_EDUCATION_NOTA.test(trimmed)) {
+    return '';
+  }
+  return trimmed;
+}
+
 export function validateSobreMi(text: string): CvValidationResult {
   const trimmed = text.trim();
   const words = trimmed.split(/\s+/).filter(Boolean);

@@ -1,16 +1,12 @@
 @if (draft(); as d) {
   <div class="cv-preview">
     <header class="cv-preview__header">
-      <a routerLink="/dashboard/generar-cv" class="cv-preview__back">
+      <a routerLink="/dashboard/generate-cv" class="cv-preview__back">
         <span aria-hidden="true">←</span> Volver
       </a>
       <div>
         <p class="cv-preview__eyebrow">Paso 2 · Vista previa</p>
         <h2 class="cv-preview__heading">Revisa y descarga tu CV</h2>
-        <p class="cv-preview__lang-hint">
-          Idioma del CV:
-          <strong>{{ d.language === 'es' ? 'Español' : 'English' }}</strong>
-        </p>
       </div>
     </header>
 

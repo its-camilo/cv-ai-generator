@@ -29,6 +29,7 @@ import {
   fitHabilidadesToLayout,
   fitSobreMiToLayout,
   normalizeCvDraftSections,
+  sanitizeEducationNota,
   validateHabilidadesLineas,
   validateSobreMi,
 } from '../utils/cv-validation';
@@ -390,7 +391,7 @@ export class CvGenerationService {
         titulo: edu.titulo?.trim() ?? '',
         fechaInicio: edu.fechaInicio?.trim() ?? '',
         fechaFin: edu.fechaFin?.trim() ?? '',
-        nota: edu.nota?.trim() ?? '',
+        nota: sanitizeEducationNota(edu.nota),
       })),
     };
   }
@@ -464,7 +465,7 @@ export class CvGenerationService {
       titulo: item.titulo,
       fechaInicio: item.fecha_inicio ?? '',
       fechaFin: item.fecha_fin ?? '',
-      nota: item.nota ?? '',
+      nota: sanitizeEducationNota(item.nota),
     }));
   }
 }

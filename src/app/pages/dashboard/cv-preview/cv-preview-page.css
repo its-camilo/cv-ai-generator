@@ -40,12 +40,6 @@
   color: var(--dash-text, #2a2118);
 }
 
-.cv-preview__lang-hint {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  color: rgba(42, 33, 24, 0.72);
-}
-
 .cv-preview__layout {
   display: grid;
   gap: 1.5rem;

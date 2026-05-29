@@ -50,7 +50,7 @@ export class GenerateCvPage {
         this.ofertaTexto(),
         this.language(),
       );
-      await this.router.navigate(['/dashboard/generar-cv/vista-previa']);
+      await this.router.navigate(['/dashboard/generate-cv/preview']);
     } catch {
       // error already in draftService
     } finally {
