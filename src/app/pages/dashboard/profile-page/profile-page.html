@@ -1,0 +1,20 @@
+<div class="profile-page">
+  <header class="profile-page__header">
+    <a routerLink="/dashboard" class="profile-page__back">
+      <span class="profile-page__back-arrow" aria-hidden="true">←</span>
+      Volver al dashboard
+    </a>
+
+    <div class="profile-page__intro">
+      <p class="profile-page__eyebrow">Inventario maestro</p>
+      <h2 class="profile-page__heading">Mi perfil</h2>
+      <p class="profile-page__subheading">
+        Completa tu inventario una vez. La IA lo adaptará para cada oferta laboral.
+      </p>
+    </div>
+  </header>
+
+  @if (user$ | async; as user) {
+    <app-profile-form [user]="user" />
+  }
+</div>

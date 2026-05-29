@@ -46,4 +46,8 @@ export class SupabaseService {
   get authReady$(): Observable<boolean> {
     return this.authReady.asObservable().pipe(filter(Boolean), take(1));
   }
+
+  getClient(): SupabaseClient {
+    return this.supabase;
+  }
 }

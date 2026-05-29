@@ -1,0 +1,174 @@
+.dashboard-home {
+  animation: dashboard-home-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dashboard-home__header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-home__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--dash-accent, #8a6b3a);
+}
+
+.dashboard-home__heading {
+  margin: 0 0 0.75rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--dash-text, #2a2118);
+}
+
+.dashboard-home__subheading {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(0.92rem, 2.2vw, 1rem);
+  line-height: 1.6;
+  color: var(--dash-muted, #5c4e3d);
+}
+
+.dashboard-home__actions {
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-home__card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: clamp(1.15rem, 3vw, 1.5rem);
+  border-radius: 1.15rem;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 252, 247, 0.75) 0%,
+    rgba(245, 235, 220, 0.55) 100%
+  );
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(196, 165, 116, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 12px 36px rgba(138, 107, 58, 0.1);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.dashboard-home__card--primary {
+  cursor: pointer;
+}
+
+.dashboard-home__card--primary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(138, 107, 58, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 16px 40px rgba(138, 107, 58, 0.14);
+}
+
+.dashboard-home__card--primary:focus-visible {
+  outline: 2px solid var(--dash-accent, #8a6b3a);
+  outline-offset: 3px;
+}
+
+.dashboard-home__card--soon {
+  opacity: 0.72;
+}
+
+.dashboard-home__card-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--dash-accent, #8a6b3a);
+  opacity: 0.55;
+}
+
+.dashboard-home__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dashboard-home__card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.45rem);
+  font-weight: 600;
+  color: var(--dash-text, #2a2118);
+}
+
+.dashboard-home__card-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--dash-muted, #5c4e3d);
+}
+
+.dashboard-home__card-arrow {
+  font-size: 1.25rem;
+  color: var(--dash-accent, #8a6b3a);
+  transition: transform 0.25s ease;
+}
+
+.dashboard-home__card--primary:hover .dashboard-home__card-arrow {
+  transform: translateX(4px);
+}
+
+.dashboard-home__badge {
+  align-self: start;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(138, 107, 58, 0.12);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dash-accent, #8a6b3a);
+}
+
+@keyframes dashboard-home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .dashboard-home__actions {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dashboard-home__card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    align-content: start;
+    min-height: 11rem;
+  }
+
+  .dashboard-home__card-arrow {
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-home,
+  .dashboard-home__card,
+  .dashboard-home__card-arrow {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,0 +1,485 @@
+@if (loading()) {
+  <div class="profile-form__loading" role="status" aria-live="polite">
+    <span class="profile-form__loading-dot" aria-hidden="true"></span>
+    Cargando tu perfil…
+  </div>
+} @else if (loadError(); as error) {
+  <div class="profile-form__error" role="alert">
+    {{ error }}
+  </div>
+} @else if (perfil(); as p) {
+  <form class="profile-form" novalidate>
+    <p class="profile-form__hint">
+      Los cambios se guardan automáticamente al salir de cada campo.
+    </p>
+
+    <!-- Datos personales -->
+    <section class="profile-form__section" aria-labelledby="section-datos">
+      <header class="profile-form__section-header">
+        <span class="profile-form__section-num" aria-hidden="true">01</span>
+        <div>
+          <h3 id="section-datos" class="profile-form__section-title">Datos personales</h3>
+          <p class="profile-form__section-desc">Siempre aparecen en cada CV generado.</p>
+        </div>
+      </header>
+
+      <div class="profile-form__grid profile-form__grid--2">
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="nombre">Nombre completo</label>
+          <input
+            id="nombre"
+            class="profile-form__input"
+            type="text"
+            autocomplete="name"
+            [value]="p.nombre_completo"
+            (input)="updatePerfilField('nombre_completo', $any($event.target).value)"
+            (blur)="savePerfilField('nombre_completo')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.nombre_completo') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.nombre_completo') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.nombre_completo') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.nombre_completo')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="carrera">Carrera / título profesional</label>
+          <input
+            id="carrera"
+            class="profile-form__input"
+            type="text"
+            [value]="p.carrera ?? ''"
+            (input)="updatePerfilField('carrera', $any($event.target).value)"
+            (blur)="savePerfilField('carrera')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.carrera') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.carrera') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.carrera') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.carrera')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="ubicacion">Ubicación</label>
+          <input
+            id="ubicacion"
+            class="profile-form__input"
+            type="text"
+            autocomplete="address-level2"
+            [value]="p.ubicacion ?? ''"
+            (input)="updatePerfilField('ubicacion', $any($event.target).value)"
+            (blur)="savePerfilField('ubicacion')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.ubicacion') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.ubicacion') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.ubicacion') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.ubicacion')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            class="profile-form__input"
+            type="tel"
+            autocomplete="tel"
+            [value]="p.telefono ?? ''"
+            (input)="updatePerfilField('telefono', $any($event.target).value)"
+            (blur)="savePerfilField('telefono')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.telefono') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.telefono') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.telefono') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.telefono')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="correo">Correo</label>
+          <input
+            id="correo"
+            class="profile-form__input"
+            type="email"
+            autocomplete="email"
+            [value]="p.correo ?? ''"
+            (input)="updatePerfilField('correo', $any($event.target).value)"
+            (blur)="savePerfilField('correo')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.correo') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.correo') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.correo') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.correo')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+
+        <div class="profile-form__field">
+          <label class="profile-form__label" for="portafolio">Portafolio / LinkedIn</label>
+          <input
+            id="portafolio"
+            class="profile-form__input"
+            type="url"
+            autocomplete="url"
+            placeholder="https://"
+            [value]="p.portafolio_url ?? ''"
+            (input)="updatePerfilField('portafolio_url', $any($event.target).value)"
+            (blur)="savePerfilField('portafolio_url')"
+          />
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('perfil.portafolio_url') === 'saving'"
+            [class.profile-form__save--saved]="fieldState('perfil.portafolio_url') === 'saved'"
+            [class.profile-form__save--error]="fieldState('perfil.portafolio_url') === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('perfil.portafolio_url')) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sobre mí -->
+    <section class="profile-form__section" aria-labelledby="section-sobre">
+      <header class="profile-form__section-header">
+        <span class="profile-form__section-num" aria-hidden="true">02</span>
+        <div>
+          <h3 id="section-sobre" class="profile-form__section-title">Sobre mí</h3>
+          <p class="profile-form__section-desc">
+            Escribe todo lo que quieras. La IA elegirá y pulirá la mejor parte para cada oferta.
+          </p>
+        </div>
+      </header>
+
+      <div class="profile-form__field profile-form__field--wide">
+        <label class="profile-form__label" for="sobre-mi">Tu historia profesional</label>
+        <textarea
+          id="sobre-mi"
+          class="profile-form__textarea profile-form__textarea--tall"
+          rows="8"
+          [value]="p.sobre_mi_largo ?? ''"
+          (input)="updatePerfilField('sobre_mi_largo', $any($event.target).value)"
+          (blur)="savePerfilField('sobre_mi_largo')"
+        ></textarea>
+        <span
+          class="profile-form__save"
+          [class.profile-form__save--saving]="fieldState('perfil.sobre_mi_largo') === 'saving'"
+          [class.profile-form__save--saved]="fieldState('perfil.sobre_mi_largo') === 'saved'"
+          [class.profile-form__save--error]="fieldState('perfil.sobre_mi_largo') === 'error'"
+          aria-live="polite"
+        >
+          @switch (fieldState('perfil.sobre_mi_largo')) {
+            @case ('saving') { Guardando… }
+            @case ('saved') { Guardado }
+            @case ('error') { Error al guardar }
+          }
+        </span>
+      </div>
+    </section>
+
+    <!-- Experiencia laboral -->
+    <section class="profile-form__section" aria-labelledby="section-exp">
+      <header class="profile-form__section-header">
+        <span class="profile-form__section-num" aria-hidden="true">03</span>
+        <div>
+          <h3 id="section-exp" class="profile-form__section-title">Experiencia laboral</h3>
+          <p class="profile-form__section-desc">
+            Misma estructura siempre. La IA adaptará la descripción según la oferta.
+          </p>
+        </div>
+        <button type="button" class="profile-form__add" (click)="addExperiencia()">
+          + Añadir experiencia
+        </button>
+      </header>
+
+      @if (experiencias().length === 0) {
+        <p class="profile-form__empty">Aún no hay experiencias. Añade la primera.</p>
+      }
+
+      @for (exp of experiencias(); track exp.id; let i = $index) {
+        <article class="profile-form__card" [attr.aria-label]="'Experiencia ' + (i + 1)">
+          <div class="profile-form__card-top">
+            <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
+            <button
+              type="button"
+              class="profile-form__remove"
+              (click)="removeExperiencia(i)"
+              [attr.aria-label]="'Eliminar experiencia ' + (i + 1)"
+            >
+              Eliminar
+            </button>
+          </div>
+
+          <div class="profile-form__grid profile-form__grid--2">
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'exp-lugar-' + i">Empresa / lugar</label>
+              <input
+                [id]="'exp-lugar-' + i"
+                class="profile-form__input"
+                type="text"
+                [value]="exp.lugar"
+                (input)="updateExperiencia(i, 'lugar', $any($event.target).value)"
+                (blur)="saveExperiencia(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'exp-cargo-' + i">Cargo</label>
+              <input
+                [id]="'exp-cargo-' + i"
+                class="profile-form__input"
+                type="text"
+                [value]="exp.cargo"
+                (input)="updateExperiencia(i, 'cargo', $any($event.target).value)"
+                (blur)="saveExperiencia(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'exp-inicio-' + i">Fecha inicio</label>
+              <input
+                [id]="'exp-inicio-' + i"
+                class="profile-form__input"
+                type="month"
+                [value]="exp.fecha_inicio"
+                (input)="updateExperiencia(i, 'fecha_inicio', $any($event.target).value)"
+                (blur)="saveExperiencia(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'exp-fin-' + i">Fecha fin</label>
+              <input
+                [id]="'exp-fin-' + i"
+                class="profile-form__input"
+                type="month"
+                [value]="exp.fecha_fin ?? ''"
+                (input)="updateExperiencia(i, 'fecha_fin', $any($event.target).value || null)"
+                (blur)="saveExperiencia(i)"
+              />
+            </div>
+          </div>
+
+          <div class="profile-form__field profile-form__field--wide">
+            <label class="profile-form__label" [for]="'exp-desc-' + i">Descripción</label>
+            <textarea
+              [id]="'exp-desc-' + i"
+              class="profile-form__textarea"
+              rows="4"
+              placeholder="Logros, responsabilidades, tecnologías…"
+              [value]="exp.descripcion ?? ''"
+              (input)="updateExperiencia(i, 'descripcion', $any($event.target).value || null)"
+              (blur)="saveExperiencia(i)"
+            ></textarea>
+          </div>
+
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('exp.' + exp.id) === 'saving'"
+            [class.profile-form__save--saved]="fieldState('exp.' + exp.id) === 'saved'"
+            [class.profile-form__save--error]="fieldState('exp.' + exp.id) === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('exp.' + exp.id)) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </article>
+      }
+    </section>
+
+    <!-- Educación -->
+    <section class="profile-form__section" aria-labelledby="section-edu">
+      <header class="profile-form__section-header">
+        <span class="profile-form__section-num" aria-hidden="true">04</span>
+        <div>
+          <h3 id="section-edu" class="profile-form__section-title">Educación</h3>
+          <p class="profile-form__section-desc">Siempre la misma en cada CV.</p>
+        </div>
+        <button type="button" class="profile-form__add" (click)="addEducacion()">
+          + Añadir educación
+        </button>
+      </header>
+
+      @if (educaciones().length === 0) {
+        <p class="profile-form__empty">Aún no hay estudios registrados.</p>
+      }
+
+      @for (edu of educaciones(); track edu.id; let i = $index) {
+        <article class="profile-form__card" [attr.aria-label]="'Educación ' + (i + 1)">
+          <div class="profile-form__card-top">
+            <span class="profile-form__card-index">{{ i + 1 | number: '2.0-0' }}</span>
+            <button
+              type="button"
+              class="profile-form__remove"
+              (click)="removeEducacion(i)"
+              [attr.aria-label]="'Eliminar educación ' + (i + 1)"
+            >
+              Eliminar
+            </button>
+          </div>
+
+          <div class="profile-form__grid profile-form__grid--2">
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'edu-lugar-' + i">Institución</label>
+              <input
+                [id]="'edu-lugar-' + i"
+                class="profile-form__input"
+                type="text"
+                [value]="edu.lugar"
+                (input)="updateEducacion(i, 'lugar', $any($event.target).value)"
+                (blur)="saveEducacion(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'edu-titulo-' + i">Título / programa</label>
+              <input
+                [id]="'edu-titulo-' + i"
+                class="profile-form__input"
+                type="text"
+                [value]="edu.titulo"
+                (input)="updateEducacion(i, 'titulo', $any($event.target).value)"
+                (blur)="saveEducacion(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'edu-inicio-' + i">Fecha inicio</label>
+              <input
+                [id]="'edu-inicio-' + i"
+                class="profile-form__input"
+                type="month"
+                [value]="edu.fecha_inicio ?? ''"
+                (input)="updateEducacion(i, 'fecha_inicio', $any($event.target).value || null)"
+                (blur)="saveEducacion(i)"
+              />
+            </div>
+
+            <div class="profile-form__field">
+              <label class="profile-form__label" [for]="'edu-fin-' + i">Fecha fin</label>
+              <input
+                [id]="'edu-fin-' + i"
+                class="profile-form__input"
+                type="month"
+                [value]="edu.fecha_fin ?? ''"
+                (input)="updateEducacion(i, 'fecha_fin', $any($event.target).value || null)"
+                (blur)="saveEducacion(i)"
+              />
+            </div>
+
+            <div class="profile-form__field profile-form__field--wide">
+              <label class="profile-form__label" [for]="'edu-nota-' + i">Nota / mención (opcional)</label>
+              <input
+                [id]="'edu-nota-' + i"
+                class="profile-form__input"
+                type="text"
+                [value]="edu.nota ?? ''"
+                (input)="updateEducacion(i, 'nota', $any($event.target).value || null)"
+                (blur)="saveEducacion(i)"
+              />
+            </div>
+          </div>
+
+          <span
+            class="profile-form__save"
+            [class.profile-form__save--saving]="fieldState('edu.' + edu.id) === 'saving'"
+            [class.profile-form__save--saved]="fieldState('edu.' + edu.id) === 'saved'"
+            [class.profile-form__save--error]="fieldState('edu.' + edu.id) === 'error'"
+            aria-live="polite"
+          >
+            @switch (fieldState('edu.' + edu.id)) {
+              @case ('saving') { Guardando… }
+              @case ('saved') { Guardado }
+              @case ('error') { Error al guardar }
+            }
+          </span>
+        </article>
+      }
+    </section>
+
+    <!-- Habilidades -->
+    <section class="profile-form__section profile-form__section--last" aria-labelledby="section-skills">
+      <header class="profile-form__section-header">
+        <span class="profile-form__section-num" aria-hidden="true">05</span>
+        <div>
+          <h3 id="section-skills" class="profile-form__section-title">Habilidades</h3>
+          <p class="profile-form__section-desc">
+            Una lista larga separada por comas. La IA elegirá las más relevantes para cada oferta.
+          </p>
+        </div>
+      </header>
+
+      <div class="profile-form__field profile-form__field--wide">
+        <label class="profile-form__label" for="habilidades">Inventario de habilidades</label>
+        <textarea
+          id="habilidades"
+          class="profile-form__textarea profile-form__textarea--skills"
+          rows="3"
+          placeholder="TypeScript, Angular, liderazgo de equipos, diseño UX, PostgreSQL, comunicación…"
+          [value]="p.habilidades_largo ?? ''"
+          (input)="updatePerfilField('habilidades_largo', $any($event.target).value)"
+          (blur)="savePerfilField('habilidades_largo')"
+        ></textarea>
+        <span
+          class="profile-form__save"
+          [class.profile-form__save--saving]="fieldState('perfil.habilidades_largo') === 'saving'"
+          [class.profile-form__save--saved]="fieldState('perfil.habilidades_largo') === 'saved'"
+          [class.profile-form__save--error]="fieldState('perfil.habilidades_largo') === 'error'"
+          aria-live="polite"
+        >
+          @switch (fieldState('perfil.habilidades_largo')) {
+            @case ('saving') { Guardando… }
+            @case ('saved') { Guardado }
+            @case ('error') { Error al guardar }
+          }
+        </span>
+      </div>
+    </section>
+  </form>
+}

@@ -22,7 +22,10 @@ describe('DashboardComponent', () => {
         },
         {
           provide: Router,
-          useValue: { navigate: vi.fn() },
+          useValue: {
+            navigate: vi.fn(),
+            events: of(),
+          },
         },
       ],
     }).compileComponents();

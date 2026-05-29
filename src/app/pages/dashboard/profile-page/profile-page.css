@@ -1,0 +1,91 @@
+.profile-page {
+  animation: profile-page-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.profile-page__header {
+  margin-bottom: 2rem;
+}
+
+.profile-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 0.85rem 0.5rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(138, 107, 58, 0.3);
+  background: rgba(255, 252, 247, 0.55);
+  color: var(--dash-text, #2a2118);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.profile-page__back:hover {
+  background: rgba(255, 252, 247, 0.9);
+  border-color: rgba(138, 107, 58, 0.5);
+  transform: translateX(-2px);
+}
+
+.profile-page__back:focus-visible {
+  outline: 2px solid var(--dash-accent, #8a6b3a);
+  outline-offset: 3px;
+}
+
+.profile-page__back-arrow {
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--dash-accent, #8a6b3a);
+}
+
+.profile-page__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--dash-accent, #8a6b3a);
+}
+
+.profile-page__heading {
+  margin: 0 0 0.75rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--dash-text, #2a2118);
+}
+
+.profile-page__subheading {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(0.92rem, 2.2vw, 1rem);
+  line-height: 1.6;
+  color: var(--dash-muted, #5c4e3d);
+}
+
+@keyframes profile-page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-page,
+  .profile-page__back {
+    animation: none;
+    transition: none;
+  }
+}
