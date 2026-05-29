@@ -86,10 +86,57 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
       const scale = availableWidth >= CV_PAGE_WIDTH_PX ? 1 : availableWidth / CV_PAGE_WIDTH_PX;
       this.paperScale.set(scale);
       this.cdr.markForCheck();
+      this.reportPaperLayoutDebug(scale, availableWidth);
     });
 
     observer.observe(wrap);
     this.destroyRef.onDestroy(() => observer.disconnect());
+  }
+
+  private reportPaperLayoutDebug(scale: number, availableWidth: number): void {
+    requestAnimationFrame(() => {
+      const wrap = this.paperWrap()?.nativeElement;
+      const paper = this.printRoot()?.nativeElement;
+      const doc = paper?.querySelector('.cv-doc') as HTMLElement | null;
+      const scaler = paper?.parentElement;
+      const stage = wrap?.parentElement;
+      if (!wrap || !paper || !doc || !scaler || !stage) return;
+
+      const docRect = doc.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const paperStyle = getComputedStyle(paper);
+      const data = {
+        scale,
+        availableWidth,
+        viewportWidth: window.innerWidth,
+        centerDeltaPx: docRect.left + docRect.width / 2 - (stageRect.left + stageRect.width / 2),
+        docLeft: docRect.left,
+        stageLeft: stageRect.left,
+        stageWidth: stageRect.width,
+        paperLayoutWidth: paper.clientWidth,
+        paperOffsetLeft: paper.offsetLeft,
+        scalerWidth: scaler.getBoundingClientRect().width,
+        transformOrigin: paperStyle.transformOrigin,
+      };
+
+      (window as unknown as { __cvPreviewLayoutDebug?: unknown }).__cvPreviewLayoutDebug = data;
+
+      // #region agent log
+      fetch('http://127.0.0.1:7940/ingest/c522538b-4156-4960-8da8-a6010f3eef16', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ec640b' },
+        body: JSON.stringify({
+          sessionId: 'ec640b',
+          runId: 'mobile-layout',
+          hypothesisId: 'B',
+          location: 'cv-preview-page.ts:reportPaperLayoutDebug',
+          message: 'paper layout metrics',
+          data,
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
+    });
   }
 
   private loadLayoutE2eFixtureIfRequested(): void {

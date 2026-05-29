@@ -80,11 +80,16 @@ test.describe('CV layout — Globant AI Lead (EN)', () => {
 
     const metrics = await page.evaluate(() => {
       const doc = document.querySelector('.cv-doc') as HTMLElement;
-      const style = getComputedStyle(doc);
-      const rect = doc.getBoundingClientRect();
+      const paper = document.querySelector('.cv-preview__paper') as HTMLElement;
       const scaler = document.querySelector('.cv-preview__paper-scaler') as HTMLElement;
+      const wrap = document.querySelector('.cv-preview__paper-wrap') as HTMLElement;
+      const stage = document.querySelector('.cv-preview__stage') as HTMLElement;
+      const host = document.querySelector('app-cv-preview-page') as HTMLElement;
+      const style = getComputedStyle(doc);
+      const paperStyle = getComputedStyle(paper);
+      const rect = doc.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
       const scale = Number.parseFloat(getComputedStyle(scaler).getPropertyValue('--paper-scale')) || 1;
-      const sheet = document.querySelector('.cv-doc__sheet') as HTMLElement;
       const inner = doc.clientHeight - (Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom));
 
       return {
@@ -94,7 +99,20 @@ test.describe('CV layout — Globant AI Lead (EN)', () => {
         visualHeightPx: rect.height,
         aspectRatio: rect.width / rect.height,
         scale,
-        overflows: (sheet?.scrollHeight ?? 0) > inner + 1,
+        overflows: (document.querySelector('.cv-doc__sheet') as HTMLElement).scrollHeight > inner + 1,
+        docLeft: rect.left,
+        docRight: rect.right,
+        stageLeft: stageRect.left,
+        stageRight: stageRect.right,
+        stageWidth: stageRect.width,
+        viewportWidth: window.innerWidth,
+        paperLayoutWidth: paper.clientWidth,
+        paperOffsetLeft: paper.offsetLeft,
+        transformOrigin: paperStyle.transformOrigin,
+        hostLeft: host?.getBoundingClientRect().left ?? 0,
+        wrapLeft: wrap.getBoundingClientRect().left,
+        scalerWidth: scaler.getBoundingClientRect().width,
+        centerDeltaPx: rect.left + rect.width / 2 - (stageRect.left + stageRect.width / 2),
       };
     });
 
@@ -106,5 +124,6 @@ test.describe('CV layout — Globant AI Lead (EN)', () => {
     expect(metrics.visualWidthPx).toBeGreaterThan(340);
     expect(metrics.visualWidthPx).toBeLessThanOrEqual(400);
     expect(metrics.overflows).toBe(false);
+    expect(Math.abs(metrics.centerDeltaPx)).toBeLessThan(12);
   });
 });

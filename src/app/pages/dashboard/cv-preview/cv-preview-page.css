@@ -285,16 +285,26 @@
       0 10px 28px rgba(138, 107, 58, 0.06);
   }
 
+  .cv-preview__paper-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
   .cv-preview__paper-scaler {
+    width: calc(8.5in * var(--paper-scale, 1));
     max-width: 100%;
+    margin-inline: auto;
     height: calc(11in * var(--paper-scale, 1));
+    overflow: hidden;
   }
 
   .cv-preview__paper {
     width: 8.5in;
     max-width: none;
+    margin: 0;
     transform: scale(var(--paper-scale, 1));
-    transform-origin: top center;
+    transform-origin: top left;
     filter: drop-shadow(0 10px 28px rgba(42, 33, 24, 0.1));
   }
 
