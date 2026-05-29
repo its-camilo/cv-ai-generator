@@ -11,7 +11,8 @@
 
   position: relative;
   min-height: 100dvh;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: auto;
   background: var(--dash-bg);
   color: var(--dash-text);
 }

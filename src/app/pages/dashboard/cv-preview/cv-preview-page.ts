@@ -78,8 +78,12 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
     if (!wrap || typeof ResizeObserver === 'undefined') return;
 
     const observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
-      const scale = width >= CV_PAGE_WIDTH_PX ? 1 : width / CV_PAGE_WIDTH_PX;
+      const target = entry.target as HTMLElement;
+      const style = getComputedStyle(target);
+      const paddingInline =
+        (Number.parseFloat(style.paddingLeft) || 0) + (Number.parseFloat(style.paddingRight) || 0);
+      const availableWidth = Math.max(0, entry.contentRect.width - paddingInline);
+      const scale = availableWidth >= CV_PAGE_WIDTH_PX ? 1 : availableWidth / CV_PAGE_WIDTH_PX;
       this.paperScale.set(scale);
       this.cdr.markForCheck();
     });

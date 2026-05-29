@@ -4,13 +4,13 @@
       <a routerLink="/dashboard/generate-cv" class="cv-preview__back">
         <span aria-hidden="true">←</span> Volver
       </a>
-      <div>
+      <div class="cv-preview__intro">
         <p class="cv-preview__eyebrow">Paso 2 · Vista previa</p>
         <h2 class="cv-preview__heading">Revisa y descarga tu CV</h2>
       </div>
     </header>
 
-    <div class="cv-preview__layout">
+    <section class="cv-preview__stage" aria-label="Previsualización del CV">
       <div class="cv-preview__paper-wrap" #paperWrap>
         <div
           class="cv-preview__paper-scaler"
@@ -21,21 +21,22 @@
           </div>
         </div>
       </div>
+    </section>
 
-      <aside class="cv-preview__editor" aria-label="Editor del CV">
-        @if (validationWarnings().length > 0) {
-          <div class="cv-preview__alert cv-preview__alert--warn" role="status">
-            @for (err of validationWarnings(); track err) {
-              <p>{{ err }}</p>
-            }
-          </div>
-        }
+    <div class="cv-preview__forms" aria-label="Editor del CV">
+      @if (validationWarnings().length > 0) {
+        <div class="cv-preview__alert cv-preview__alert--warn" role="status">
+          @for (err of validationWarnings(); track err) {
+            <p>{{ err }}</p>
+          }
+        </div>
+      }
 
-        @if (aiError(); as err) {
-          <div class="cv-preview__alert cv-preview__alert--error" role="alert">{{ err }}</div>
-        }
+      @if (aiError(); as err) {
+        <div class="cv-preview__alert cv-preview__alert--error" role="alert">{{ err }}</div>
+      }
 
-        <section class="cv-preview__panel">
+      <section class="cv-preview__panel">
           <h3 class="cv-preview__panel-title">{{ editorLabels.pdfFileName }}</h3>
           <label class="cv-preview__label" for="pdf-name">{{ editorLabels.pdfFileNameHint }}</label>
           <input
@@ -172,7 +173,6 @@
             @if (downloadLoading()) { Generando PDF… } @else { Descargar PDF }
           </button>
         </div>
-      </aside>
     </div>
   </div>
 }

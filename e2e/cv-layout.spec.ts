@@ -103,7 +103,8 @@ test.describe('CV layout — Globant AI Lead (EN)', () => {
     expect(metrics.aspectRatio).toBeCloseTo(8.5 / 11, 2);
     expect(metrics.scale).toBeLessThan(1);
     expect(metrics.scale).toBeGreaterThan(0.4);
-    expect(metrics.visualWidthPx).toBeLessThanOrEqual(392);
+    expect(metrics.visualWidthPx).toBeGreaterThan(340);
+    expect(metrics.visualWidthPx).toBeLessThanOrEqual(400);
     expect(metrics.overflows).toBe(false);
   });
 });
