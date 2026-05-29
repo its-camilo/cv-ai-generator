@@ -1,1 +1,103 @@
-<p>login works!</p>
+<section class="login" aria-labelledby="login-title">
+  <app-grainient
+    color1="#c4a574"
+    color2="#5c2430"
+    color3="#0c0b0a"
+    [timeSpeed]="0.18"
+    [grainAmount]="0.14"
+  />
+
+  <div class="login__vignette" aria-hidden="true"></div>
+  <div class="login__frame login__frame--tl" aria-hidden="true"></div>
+  <div class="login__frame login__frame--br" aria-hidden="true"></div>
+
+  <div class="login__layout">
+    <aside class="login__showcase" aria-label="Cómo funciona">
+      <p class="login__showcase-tag">Tu ventaja profesional</p>
+
+      <ol class="login__steps">
+        @for (step of steps; track step.number) {
+          <li class="login__step" [style.animation-delay.ms]="step.delay">
+            <span class="login__step-number" aria-hidden="true">{{ step.number }}</span>
+            <div class="login__step-body">
+              <h2 class="login__step-title">{{ step.title }}</h2>
+              <p class="login__step-text">{{ step.text }}</p>
+            </div>
+          </li>
+        }
+      </ol>
+
+      <blockquote class="login__quote">
+        <p>“Un perfil. CVs infinitos. Cada uno listo para la vacante que quieres.”</p>
+      </blockquote>
+    </aside>
+
+    <div class="login__divider" aria-hidden="true"></div>
+
+    <div class="login__content">
+      <p class="login__eyebrow">
+        <span class="login__eyebrow-line" aria-hidden="true"></span>
+        Plataforma de inteligencia profesional
+      </p>
+
+      <h1 id="login-title" class="login__title">
+        @for (word of titleWords; track word.text; let i = $index) {
+          <span
+            class="login__title-word"
+            [style.animation-delay.ms]="word.delay"
+          >
+            {{ word.text }}
+          </span>
+        }
+      </h1>
+
+      <p class="login__lede">
+        Crea CVs a medida con precisión. Un perfil, infinitas oportunidades.
+      </p>
+
+      <div class="login__actions">
+        <app-glare-hover
+          width="100%"
+          height="auto"
+          background="transparent"
+          borderRadius="999px"
+          borderColor="rgba(196, 165, 116, 0.45)"
+          glareColor="#f5e6c8"
+          [glareOpacity]="0.6"
+          [glareAngle]="-28"
+          [glareSize]="320"
+          [transitionDuration]="750"
+        >
+          <button
+            type="button"
+            class="login__button"
+            [disabled]="isSigningIn()"
+            (click)="handleLogin()"
+          >
+            <svg class="login__button-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="currentColor"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            <span>{{ isSigningIn() ? 'Conectando…' : 'Iniciar sesión con Google' }}</span>
+          </button>
+        </app-glare-hover>
+      </div>
+
+      <p class="login__footnote">OAuth seguro · Tus datos permanecen privados</p>
+    </div>
+  </div>
+</section>

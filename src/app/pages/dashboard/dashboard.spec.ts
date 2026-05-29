@@ -1,17 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
+import { DashboardComponent } from './dashboard.component';
+import { SupabaseService } from '../../core/services/supabase.service';
 
-import { Dashboard } from './dashboard';
-
-describe('Dashboard', () => {
-  let component: Dashboard;
-  let fixture: ComponentFixture<Dashboard>;
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Dashboard],
+      imports: [DashboardComponent],
+      providers: [
+        {
+          provide: SupabaseService,
+          useValue: {
+            authReady$: of(true),
+            user$: of({ email: 'test@example.com' }),
+            signOut: vi.fn(),
+          },
+        },
+        {
+          provide: Router,
+          useValue: { navigate: vi.fn() },
+        },
+      ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Dashboard);
+    fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

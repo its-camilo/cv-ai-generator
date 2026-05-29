@@ -1,28 +1,57 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { SupabaseService } from '../../core/services/supabase.service';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
+import { SupabaseService } from '../../core/services/supabase.service';
+import { Grainient } from '../../shared/ui/grainient/grainient';
+import { GlareHover } from '../../shared/ui/glare-hover/glare-hover';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  template: `
-    <div class="login-container">
-      <h1>Generador de CVs IA</h1>
-      <p>Automatiza tu carrera con precisión.</p>
-      <button (click)="handleLogin()">Iniciar sesión con Google</button>
-    </div>
-  `,
-  styles: [`
-    .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif;}
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #4285F4; color: white; border: none; border-radius: 4px;}
-  `]
+  imports: [Grainient, GlareHover],
+  templateUrl: './login.html',
+  styleUrl: './login.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
-  private supabase = inject(SupabaseService);
-  private router = inject(Router);
+  private readonly supabase = inject(SupabaseService);
+  private readonly router = inject(Router);
 
-  ngOnInit() {
+  readonly isSigningIn = signal(false);
+
+  readonly titleWords = [
+    { text: 'CV', delay: 120 },
+    { text: 'AI', delay: 280 },
+    { text: 'Generator', delay: 440 },
+  ];
+
+  readonly steps = [
+    {
+      number: '01',
+      title: 'Centraliza tu perfil',
+      text: 'Guarda experiencia, habilidades y logros en un solo lugar.',
+      delay: 600,
+    },
+    {
+      number: '02',
+      title: 'Adapta con IA',
+      text: 'Genera un CV distinto para cada vacante en segundos.',
+      delay: 780,
+    },
+    {
+      number: '03',
+      title: 'Postula con confianza',
+      text: 'Descarga, revisa y envía sin empezar desde cero.',
+      delay: 960,
+    },
+  ];
+
+  ngOnInit(): void {
     combineLatest([this.supabase.authReady$, this.supabase.user$]).subscribe(([, user]) => {
       if (user) {
         this.router.navigate(['/dashboard']);
@@ -30,11 +59,15 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  async handleLogin() {
+  async handleLogin(): Promise<void> {
+    if (this.isSigningIn()) return;
+
+    this.isSigningIn.set(true);
     try {
       await this.supabase.signInWithGoogle();
     } catch (error) {
       console.error('Error al iniciar sesión', error);
+      this.isSigningIn.set(false);
     }
   }
 }

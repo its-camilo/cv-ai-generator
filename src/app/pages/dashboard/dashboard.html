@@ -1,1 +1,48 @@
-<p>dashboard works!</p>
+<section class="dashboard">
+  <app-grainient
+    color1="#faf3e8"
+    color2="#e8d5b5"
+    color3="#d9c4a0"
+    [timeSpeed]="0.12"
+    [grainAmount]="0.08"
+  />
+
+  <div class="dashboard__vignette" aria-hidden="true"></div>
+
+  @if (user$ | async; as user) {
+    <header class="dashboard__topbar">
+      <div class="dashboard__topbar-brand">
+        <span class="dashboard__topbar-mark" aria-hidden="true"></span>
+        <h1 class="dashboard__topbar-title">Dashboard</h1>
+      </div>
+
+      <p class="dashboard__topbar-user">
+        <span class="dashboard__topbar-user-label">Usuario:</span>
+        <span class="dashboard__topbar-user-email">{{ user.email }}</span>
+      </p>
+
+      <button type="button" class="dashboard__logout" (click)="handleLogout()">
+        Cerrar sesión
+      </button>
+    </header>
+
+    <main class="dashboard__main">
+      <div class="dashboard__main-header">
+        <p class="dashboard__eyebrow">Tu espacio de trabajo</p>
+        <h2 class="dashboard__heading">Tu Inventario Profesional</h2>
+        <p class="dashboard__subheading">
+          Aquí podrás gestionar tu perfil, experiencias y CVs generados.
+        </p>
+      </div>
+
+      <div class="dashboard__panel dashboard__panel--glass">
+        <p class="dashboard__panel-empty">Próximamente: tu inventario de CVs y experiencias.</p>
+      </div>
+    </main>
+  } @else {
+    <div class="dashboard__loading" role="status" aria-live="polite">
+      <span class="dashboard__loading-dot" aria-hidden="true"></span>
+      Cargando sesión o redirigiendo…
+    </div>
+  }
+</section>
