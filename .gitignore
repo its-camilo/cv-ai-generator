@@ -64,3 +64,4 @@ credentials.json
 .DS_Store
 Thumbs.db
 .vercel
+.cursor/debug-*.log
