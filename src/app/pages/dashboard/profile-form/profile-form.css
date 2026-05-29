@@ -416,6 +416,23 @@
   }
 }
 
+@media (max-width: 1099px) {
+  .profile-form {
+    gap: 1.35rem;
+  }
+
+  .profile-form__section {
+    background: linear-gradient(
+      145deg,
+      rgba(255, 252, 247, 0.62) 0%,
+      rgba(245, 235, 220, 0.42) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      0 8px 24px rgba(138, 107, 58, 0.05);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .profile-form__section,
   .profile-form__loading-dot {

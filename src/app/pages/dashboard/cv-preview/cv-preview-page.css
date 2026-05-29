@@ -264,25 +264,15 @@
 }
 
 @media (max-width: 1099px) {
-  :host {
-    margin-inline: calc(-1 * clamp(0.75rem, 3vw, 1.5rem));
-    width: calc(100% + 2 * clamp(0.75rem, 3vw, 1.5rem));
-  }
-
   .cv-preview__header {
-    padding-inline: clamp(0.75rem, 3vw, 1.5rem);
     margin-bottom: 1rem;
   }
 
   .cv-preview__stage {
-    padding: 1.15rem clamp(0.5rem, 2vw, 0.85rem) 1.35rem;
-    background:
-      linear-gradient(180deg, rgba(255, 252, 247, 0.72) 0%, rgba(245, 235, 220, 0.48) 100%),
-      radial-gradient(ellipse 120% 80% at 50% 0%, rgba(255, 255, 255, 0.45) 0%, transparent 70%);
-    border-block: 1px solid rgba(196, 165, 116, 0.24);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      0 10px 28px rgba(138, 107, 58, 0.06);
+    padding: 0.85rem 0 1.15rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
 
   .cv-preview__paper-wrap {
@@ -310,11 +300,18 @@
 
   .cv-preview__forms {
     gap: 0.75rem;
-    padding: 1.15rem clamp(0.75rem, 3vw, 1.5rem) 2rem;
+    padding: 0.5rem 0 2rem;
   }
 
   .cv-preview__panel {
     padding: 1.05rem 1rem;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 252, 247, 0.62) 0%,
+      rgba(245, 235, 220, 0.42) 100%
+    );
+    backdrop-filter: blur(12px) saturate(130%);
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
   }
 
   .cv-preview__row {
