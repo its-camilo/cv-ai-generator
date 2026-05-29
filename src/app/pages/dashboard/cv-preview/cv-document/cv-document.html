@@ -1,0 +1,111 @@
+@let d = draft();
+<article
+  class="cv-doc"
+  [id]="printRootId()"
+  [style]="pageTuneVars()"
+  [attr.aria-label]="'Vista previa del CV de ' + formatFullName(d)"
+>
+  <div class="cv-doc__sheet">
+    <div class="cv-doc__top-bar" aria-hidden="true"></div>
+
+    <div class="cv-doc__content">
+      <header class="cv-doc__header">
+        <h1 class="cv-doc__name">{{ formatFullName(d) }}</h1>
+        @if (d.carrera) {
+          <p class="cv-doc__carrera">{{ d.carrera }}</p>
+        }
+        @if (d.ubicacion) {
+          <p class="cv-doc__contact-line">{{ d.ubicacion }}</p>
+        }
+        @if (d.telefono) {
+          <p class="cv-doc__contact-line">{{ formatPhoneLine(d) }}</p>
+        }
+        @if (d.correo) {
+          <p class="cv-doc__contact-line">
+            {{ d.sectionLabels.correo }}:
+            <a class="cv-doc__link" [href]="'mailto:' + d.correo">{{ d.correo }}</a>
+          </p>
+        }
+        @if (d.portafolioUrl) {
+          <p class="cv-doc__contact-line">
+            {{ d.sectionLabels.portafolio }}:
+            <a class="cv-doc__link" [href]="d.portafolioUrl" target="_blank" rel="noopener noreferrer">{{
+              d.portafolioUrl
+            }}</a>
+          </p>
+        }
+        @if (d.githubUrl) {
+          <p class="cv-doc__contact-line">
+            {{ d.sectionLabels.github }}:
+            <a class="cv-doc__link" [href]="d.githubUrl" target="_blank" rel="noopener noreferrer">{{
+              d.githubUrl
+            }}</a>
+          </p>
+        }
+      </header>
+
+      <div class="cv-doc__sections" [class.cv-doc__sections--fill]="d.pageTune.fillPage">
+        <section class="cv-doc__section cv-doc__section--first">
+          <h2 class="cv-doc__section-title">{{ d.sectionLabels.sobreMi }}</h2>
+          <p class="cv-doc__sobre">{{ d.sobreMi }}</p>
+        </section>
+
+        @if (d.experiencias.length > 0) {
+          <section class="cv-doc__section">
+            <h2 class="cv-doc__section-title">{{ d.sectionLabels.experiencia }}</h2>
+            @for (exp of d.experiencias; track $index) {
+              <div class="cv-doc__block">
+                <p class="cv-doc__block-head">
+                  <strong class="cv-doc__block-primary">{{ exp.lugar }}</strong>
+                  @if (exp.cargo) {
+                    <span class="cv-doc__block-secondary"> - {{ exp.cargo }}</span>
+                  }
+                </p>
+                @if (formatExpDates(exp.fechaInicio, exp.fechaFin)) {
+                  <p class="cv-doc__block-dates">{{ formatExpDates(exp.fechaInicio, exp.fechaFin) }}</p>
+                }
+                @for (bullet of expBullets(exp.descripcion); track $index) {
+                  <p class="cv-doc__bullet">● {{ bullet }}</p>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        @if (d.educaciones.length > 0) {
+          <section class="cv-doc__section">
+            <h2 class="cv-doc__section-title">{{ d.sectionLabels.educacion }}</h2>
+            @for (edu of d.educaciones; track $index) {
+              @let head = blockHeadline(edu.lugar, edu.titulo);
+              <div class="cv-doc__block">
+                @if (head.primary) {
+                  <p class="cv-doc__block-head">
+                    <strong class="cv-doc__block-primary">{{ head.primary }}</strong>
+                    @if (head.secondary) {
+                      <span class="cv-doc__block-secondary"> - {{ head.secondary }}</span>
+                    }
+                  </p>
+                }
+                @if (formatEduDates(edu.fechaInicio, edu.fechaFin)) {
+                  <p class="cv-doc__block-dates">{{ formatEduDates(edu.fechaInicio, edu.fechaFin) }}</p>
+                }
+                @if (edu.nota) {
+                  <p class="cv-doc__block-note">{{ edu.nota }}</p>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        @if (d.habilidadesLineas.length > 0) {
+          <section class="cv-doc__section cv-doc__section--skills">
+            <h2 class="cv-doc__section-title">{{ d.sectionLabels.habilidades }}</h2>
+            @for (linea of d.habilidadesLineas; track $index) {
+              <p class="cv-doc__skill-line">{{ linea }}</p>
+            }
+          </section>
+        }
+      </div>
+    </div>
+  </div>
+</article>

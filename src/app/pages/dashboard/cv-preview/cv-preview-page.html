@@ -1,0 +1,177 @@
+@if (draft(); as d) {
+  <div class="cv-preview">
+    <header class="cv-preview__header">
+      <a routerLink="/dashboard/generar-cv" class="cv-preview__back">
+        <span aria-hidden="true">←</span> Volver
+      </a>
+      <div>
+        <p class="cv-preview__eyebrow">Paso 2 · Vista previa</p>
+        <h2 class="cv-preview__heading">Revisa y descarga tu CV</h2>
+        <p class="cv-preview__lang-hint">
+          Idioma del CV:
+          <strong>{{ d.language === 'es' ? 'Español' : 'English' }}</strong>
+        </p>
+      </div>
+    </header>
+
+    <div class="cv-preview__layout">
+      <div class="cv-preview__paper-wrap">
+        <div #printRoot class="cv-preview__paper">
+          <app-cv-document [draft]="d" />
+        </div>
+      </div>
+
+      <aside class="cv-preview__editor" aria-label="Editor del CV">
+        @if (validationWarnings().length > 0) {
+          <div class="cv-preview__alert cv-preview__alert--warn" role="status">
+            @for (err of validationWarnings(); track err) {
+              <p>{{ err }}</p>
+            }
+          </div>
+        }
+
+        @if (aiError(); as err) {
+          <div class="cv-preview__alert cv-preview__alert--error" role="alert">{{ err }}</div>
+        }
+
+        <section class="cv-preview__panel">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.pdfFileName }}</h3>
+          <label class="cv-preview__label" for="pdf-name">{{ editorLabels.pdfFileNameHint }}</label>
+          <input
+            id="pdf-name"
+            class="cv-preview__input"
+            type="text"
+            [value]="d.pdfFileName"
+            (input)="updateField('pdfFileName', $any($event.target).value)"
+          />
+        </section>
+
+        <section class="cv-preview__panel">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.personalData }}</h3>
+          <label class="cv-preview__label" for="nombre1">{{ editorLabels.nombreLinea1 }}</label>
+          <input id="nombre1" class="cv-preview__input" type="text" [value]="d.nombreLinea1"
+            (input)="updateField('nombreLinea1', $any($event.target).value)" />
+          <label class="cv-preview__label" for="nombre2">{{ editorLabels.nombreLinea2 }}</label>
+          <input id="nombre2" class="cv-preview__input" type="text" [value]="d.nombreLinea2"
+            (input)="updateField('nombreLinea2', $any($event.target).value)" />
+          <label class="cv-preview__label" for="carrera">{{ editorLabels.carrera }}</label>
+          <input id="carrera" class="cv-preview__input" type="text" [value]="d.carrera"
+            (input)="updateField('carrera', $any($event.target).value)" />
+          <label class="cv-preview__label" for="ubicacion">{{ editorLabels.ubicacion }}</label>
+          <input id="ubicacion" class="cv-preview__input" type="text" [value]="d.ubicacion"
+            (input)="updateField('ubicacion', $any($event.target).value)" />
+          <label class="cv-preview__label" for="telefono">{{ editorLabels.telefono }}</label>
+          <input id="telefono" class="cv-preview__input" type="text" [value]="d.telefono"
+            (input)="updateField('telefono', $any($event.target).value)" />
+          <label class="cv-preview__label" for="correo">{{ editorLabels.correo }}</label>
+          <input id="correo" class="cv-preview__input" type="email" [value]="d.correo"
+            (input)="updateField('correo', $any($event.target).value)" />
+          <label class="cv-preview__label" for="portafolio">{{ editorLabels.portafolio }}</label>
+          <input id="portafolio" class="cv-preview__input" type="url" [value]="d.portafolioUrl"
+            (input)="updateField('portafolioUrl', $any($event.target).value)" />
+          <label class="cv-preview__label" for="github">{{ editorLabels.github }}</label>
+          <input id="github" class="cv-preview__input" type="url" [value]="d.githubUrl"
+            (input)="updateField('githubUrl', $any($event.target).value)" />
+        </section>
+
+        <section class="cv-preview__panel cv-preview__panel--ai">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.sobreMi }}</h3>
+          <label class="cv-preview__label" for="sobre-mi">{{ editorLabels.sobreMiTexto }}</label>
+          <textarea id="sobre-mi" class="cv-preview__textarea" rows="4" [value]="d.sobreMi"
+            (input)="updateField('sobreMi', $any($event.target).value)"></textarea>
+          <p class="cv-preview__hint">{{ d.sobreMi.length }} {{ editorLabels.sobreMiChars }}</p>
+          <label class="cv-preview__label" for="refine-sobre">{{ editorLabels.refineSobre }}</label>
+          <textarea id="refine-sobre" class="cv-preview__textarea cv-preview__textarea--sm" rows="2"
+            [placeholder]="editorLabels.refineSobrePlaceholder"
+            [value]="refineSobreInstruction()"
+            (input)="refineSobreInstruction.set($any($event.target).value)"></textarea>
+          <button type="button" class="cv-preview__ai-btn"
+            [disabled]="aiLoading() || !refineSobreInstruction().trim()"
+            (click)="refineSobreMi()">{{ editorLabels.refineSobreBtn }}</button>
+        </section>
+
+        <section class="cv-preview__panel">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.experiencia }}</h3>
+          @for (exp of d.experiencias; track $index; let i = $index) {
+            <div class="cv-preview__subblock">
+              <label class="cv-preview__label" [for]="'exp-l-' + i">{{ editorLabels.expLugar }}</label>
+              <input [id]="'exp-l-' + i" class="cv-preview__input" type="text" [value]="exp.lugar"
+                (input)="updateExperiencia(i, 'lugar', $any($event.target).value)" />
+              <label class="cv-preview__label" [for]="'exp-c-' + i">{{ editorLabels.expCargo }}</label>
+              <input [id]="'exp-c-' + i" class="cv-preview__input" type="text" [value]="exp.cargo"
+                (input)="updateExperiencia(i, 'cargo', $any($event.target).value)" />
+              <label class="cv-preview__label" [for]="'exp-f-' + i">{{ editorLabels.expFechas }}</label>
+              <div class="cv-preview__row">
+                <input [id]="'exp-f-' + i" class="cv-preview__input" type="text" [placeholder]="editorLabels.expInicio" [value]="exp.fechaInicio"
+                  (input)="updateExperiencia(i, 'fechaInicio', $any($event.target).value)" />
+                <input class="cv-preview__input" type="text" [placeholder]="editorLabels.expFin" [value]="exp.fechaFin"
+                  (input)="updateExperiencia(i, 'fechaFin', $any($event.target).value)" />
+              </div>
+              <label class="cv-preview__label" [for]="'exp-d-' + i">{{ editorLabels.expDescripcion }}</label>
+              <textarea [id]="'exp-d-' + i" class="cv-preview__textarea" rows="3" [value]="exp.descripcion"
+                (input)="updateExperiencia(i, 'descripcion', $any($event.target).value)"></textarea>
+            </div>
+          }
+        </section>
+
+        <section class="cv-preview__panel">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.educacion }}</h3>
+          @for (edu of d.educaciones; track $index; let i = $index) {
+            <div class="cv-preview__subblock">
+              <label class="cv-preview__label" [for]="'edu-l-' + i">{{ editorLabels.eduInstitucion }}</label>
+              <input [id]="'edu-l-' + i" class="cv-preview__input" type="text" [value]="edu.lugar"
+                (input)="updateEducacion(i, 'lugar', $any($event.target).value)" />
+              <label class="cv-preview__label" [for]="'edu-t-' + i">{{ editorLabels.eduTitulo }}</label>
+              <input [id]="'edu-t-' + i" class="cv-preview__input" type="text" [value]="edu.titulo"
+                (input)="updateEducacion(i, 'titulo', $any($event.target).value)" />
+              <label class="cv-preview__label" [for]="'edu-f-' + i">{{ editorLabels.eduFechas }}</label>
+              <div class="cv-preview__row">
+                <input class="cv-preview__input" type="text" [value]="edu.fechaInicio"
+                  (input)="updateEducacion(i, 'fechaInicio', $any($event.target).value)" />
+                <input class="cv-preview__input" type="text" [value]="edu.fechaFin"
+                  (input)="updateEducacion(i, 'fechaFin', $any($event.target).value)" />
+              </div>
+              <label class="cv-preview__label" [for]="'edu-n-' + i">{{ editorLabels.eduNota }}</label>
+              <input [id]="'edu-n-' + i" class="cv-preview__input" type="text" [value]="edu.nota"
+                (input)="updateEducacion(i, 'nota', $any($event.target).value)" />
+            </div>
+          }
+        </section>
+
+        <section class="cv-preview__panel cv-preview__panel--ai">
+          <h3 class="cv-preview__panel-title">{{ editorLabels.habilidades }}</h3>
+          @for (linea of d.habilidadesLineas; track $index; let i = $index) {
+            <label class="cv-preview__label" [for]="'skill-' + i">
+              @switch (i) {
+                @case (0) { {{ editorLabels.skillLineTools }} }
+                @case (1) { {{ editorLabels.skillLineProgramming }} }
+                @default { {{ editorLabels.skillLineLanguages }} }
+              }
+            </label>
+            <input [id]="'skill-' + i" class="cv-preview__input" type="text" [value]="linea"
+              (input)="updateHabilidadLine(i, $any($event.target).value)" />
+          }
+          <label class="cv-preview__label" for="refine-skills">{{ editorLabels.refineSkills }}</label>
+          <textarea id="refine-skills" class="cv-preview__textarea cv-preview__textarea--sm" rows="2"
+            [placeholder]="editorLabels.refineSkillsPlaceholder"
+            [value]="refineSkillsInstruction()"
+            (input)="refineSkillsInstruction.set($any($event.target).value)"></textarea>
+          <button type="button" class="cv-preview__ai-btn"
+            [disabled]="aiLoading() || !refineSkillsInstruction().trim()"
+            (click)="refineHabilidades()">{{ editorLabels.refineSkillsBtn }}</button>
+        </section>
+
+        <div class="cv-preview__footer">
+          <button
+            type="button"
+            class="cv-preview__download"
+            [disabled]="downloadLoading()"
+            (click)="downloadPdf()"
+          >
+            @if (downloadLoading()) { Generando PDF… } @else { Descargar PDF }
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+}

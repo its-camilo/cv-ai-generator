@@ -8,7 +8,10 @@
     "verify:gemini": "node scripts/verify-gemini.mjs",
     "secrets:gemini": "bash scripts/set-gemini-secrets.sh",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:layout": "vitest run src/app/core/utils/cv-page-tune.spec.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:layout": "playwright test e2e/cv-layout.spec.ts"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -21,6 +24,8 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@supabase/supabase-js": "^2.106.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "ogl": "^1.0.11",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -29,6 +34,7 @@
     "@angular/build": "^21.2.13",
     "@angular/cli": "^21.2.13",
     "@angular/compiler-cli": "^21.2.0",
+    "@playwright/test": "^1.60.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "shadcn": "^4.8.3",

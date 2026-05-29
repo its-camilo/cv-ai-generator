@@ -77,9 +77,11 @@ export async function generateContentDetailed(
     const raced = await Promise.race([
       invokePromise,
       new Promise<never>((_, reject) => {
-        options.signal!.addEventListener('abort', () => {
-          reject(new GeminiApiError('Solicitud cancelada', 499));
-        }, { once: true });
+        options.signal!.addEventListener(
+          'abort',
+          () => reject(new GeminiApiError('Solicitud cancelada', 499)),
+          { once: true },
+        );
       }),
     ]);
     data = raced.data;
