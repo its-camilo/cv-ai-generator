@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 import { LoginComponent } from './pages/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DashboardHome } from './pages/dashboard/dashboard-home/dashboard-home';
@@ -7,10 +9,11 @@ import { GenerateCvPage } from './pages/dashboard/generate-cv-page/generate-cv-p
 import { CvPreviewPage } from './pages/dashboard/cv-preview/cv-preview-page';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', component: DashboardHome },
       { path: 'profile', component: ProfilePage },

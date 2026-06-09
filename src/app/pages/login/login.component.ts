@@ -2,11 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
-import { combineLatest } from 'rxjs';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { Grainient } from '../../shared/ui/grainient/grainient';
 import { GlareHover } from '../../shared/ui/glare-hover/glare-hover';
@@ -18,9 +15,8 @@ import { GlareHover } from '../../shared/ui/glare-hover/glare-hover';
   styleUrl: './login.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   private readonly supabase = inject(SupabaseService);
-  private readonly router = inject(Router);
 
   readonly isSigningIn = signal(false);
 
@@ -50,14 +46,6 @@ export class LoginComponent implements OnInit {
       delay: 960,
     },
   ];
-
-  ngOnInit(): void {
-    combineLatest([this.supabase.authReady$, this.supabase.user$]).subscribe(([, user]) => {
-      if (user) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-  }
 
   async handleLogin(): Promise<void> {
     if (this.isSigningIn()) return;

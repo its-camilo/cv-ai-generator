@@ -15,7 +15,7 @@ describe('LoginComponent', () => {
         {
           provide: SupabaseService,
           useValue: {
-            authReady$: of(true),
+            authInitialized$: of(true),
             user$: of(null),
             signInWithGoogle: vi.fn(),
           },

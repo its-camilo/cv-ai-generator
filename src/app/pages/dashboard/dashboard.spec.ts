@@ -15,7 +15,7 @@ describe('DashboardComponent', () => {
         {
           provide: SupabaseService,
           useValue: {
-            authReady$: of(true),
+            authInitialized$: of(true),
             user$: of({ email: 'test@example.com' }),
             signOut: vi.fn(),
           },
