@@ -16,6 +16,7 @@ import type { GeneratedCvDraft } from '../../../core/models/cv.models';
 import { CvDraftService } from '../../../core/services/cv-draft.service';
 import { CvGenerationService } from '../../../core/services/cv-generation.service';
 import { PdfExportService } from '../../../core/services/pdf-export.service';
+import { CvShareService } from '../../../core/services/cv-share.service';
 import {
   normalizeCvDraftSections,
   validateCvDraftSections,
@@ -44,6 +45,7 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
   private readonly draftService = inject(CvDraftService);
   private readonly cvGeneration = inject(CvGenerationService);
   private readonly pdfExport = inject(PdfExportService);
+  private readonly cvShare = inject(CvShareService);
 
   readonly printRoot = viewChild<ElementRef<HTMLElement>>('printRoot');
   readonly paperWrap = viewChild<ElementRef<HTMLElement>>('paperWrap');
@@ -53,6 +55,9 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
   readonly aiLoading = signal(false);
   readonly aiError = signal<string | null>(null);
   readonly downloadLoading = signal(false);
+  readonly shareLoading = signal(false);
+  readonly shareLink = signal<string | null>(null);
+  readonly shareCopied = signal(false);
   readonly refineSobreInstruction = signal('');
   readonly refineSkillsInstruction = signal('');
   readonly editorLabels = CV_EDITOR_LABELS;
@@ -228,6 +233,48 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
 
   async downloadPdf(): Promise<void> {
     const d = this.draft();
+    if (!d) return;
+    this.downloadLoading.set(true);
+    try {
+      await this.withExportElement((el) => this.pdfExport.downloadElementAsPdf(el, d.pdfFileName));
+    } finally {
+      this.downloadLoading.set(false);
+    }
+  }
+
+  async generateShareLink(): Promise<void> {
+    const d = this.draft();
+    if (!d) return;
+    this.shareLoading.set(true);
+    this.shareLink.set(null);
+    this.shareCopied.set(false);
+    try {
+      await this.withExportElement(async (el) => {
+        const blob = await this.pdfExport.elementToPdfBlob(el);
+        const link = await this.cvShare.uploadAndGetLink(
+          blob,
+          this.pdfExport.safeFileName(d.pdfFileName),
+        );
+        this.shareLink.set(link);
+      }, 'No se pudo generar el enlace. Intenta de nuevo.');
+    } finally {
+      this.shareLoading.set(false);
+    }
+  }
+
+  async copyShareLink(): Promise<void> {
+    const link = this.shareLink();
+    if (!link || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(link);
+    this.shareCopied.set(true);
+  }
+
+  /** Ajusta el layout, quita el escalado de vista previa y ejecuta la exportación. */
+  private async withExportElement(
+    exportFn: (el: HTMLElement) => Promise<void>,
+    errorMessage = 'No se pudo generar el PDF. Intenta de nuevo.',
+  ): Promise<void> {
+    const d = this.draft();
     const root = this.printRoot()?.nativeElement;
     if (!d || !root) return;
 
@@ -245,11 +292,7 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
     const el = root.querySelector('.cv-doc') as HTMLElement | null;
     if (!el) return;
 
-    pageTune = refinePageTuneFromElement(
-      { ...d, ...normalized, pageTune },
-      el,
-      pageTune,
-    );
+    pageTune = refinePageTuneFromElement({ ...d, ...normalized, pageTune }, el, pageTune);
     this.draftService.updateDraft((draft) => ({ ...draft, pageTune }));
     this.cdr.detectChanges();
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -259,18 +302,17 @@ export class CvPreviewPage implements OnInit, AfterViewInit {
 
     const previousTransform = root.style.transform;
     root.style.transform = 'none';
-
-    this.downloadLoading.set(true);
     this.aiError.set(null);
     try {
       this.cdr.detectChanges();
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-      await this.pdfExport.downloadElementAsPdf(exportEl, d.pdfFileName);
-    } catch {
-      this.aiError.set('No se pudo generar el PDF. Intenta de nuevo.');
+      await exportFn(exportEl);
+    } catch (error) {
+      console.error(errorMessage, error);
+      this.aiError.set(errorMessage);
     } finally {
       root.style.transform = previousTransform;
-      this.downloadLoading.set(false);
+      this.cdr.markForCheck();
     }
   }
 
