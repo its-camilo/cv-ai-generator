@@ -71,6 +71,32 @@ export class SupabaseService {
     if (error) throw error;
   }
 
+  /**
+   * Inicia sesión con correo y contraseña. Supabase vincula identidades por correo,
+   * así que si el usuario ya existe (p. ej. creado con Google) es la misma cuenta.
+   */
+  async signInWithPassword(email: string, password: string): Promise<void> {
+    const { error } = await this.supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  }
+
+  /**
+   * Envía un enlace para crear o restablecer la contraseña. Si el correo pertenece a un
+   * usuario existente (incluido uno creado con Google), la contraseña queda en esa misma cuenta.
+   */
+  async sendPasswordSetupEmail(email: string): Promise<void> {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password',
+    });
+    if (error) throw error;
+  }
+
+  /** Asigna o cambia la contraseña del usuario con sesión activa. */
+  async updatePassword(password: string): Promise<void> {
+    const { error } = await this.supabase.auth.updateUser({ password });
+    if (error) throw error;
+  }
+
   async signOut(): Promise<void> {
     const { error } = await this.supabase.auth.signOut();
     if (error) throw error;
