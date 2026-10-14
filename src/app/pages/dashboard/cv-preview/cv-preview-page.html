@@ -172,6 +172,26 @@
           >
             @if (downloadLoading()) { Generando PDF… } @else { Descargar PDF }
           </button>
+          <button
+            type="button"
+            class="cv-preview__download cv-preview__download--ghost"
+            [disabled]="shareLoading() || downloadLoading()"
+            (click)="generateShareLink()"
+          >
+            @if (shareLoading()) { Generando enlace… } @else { Generar enlace }
+          </button>
+          @if (shareLink(); as link) {
+            <div class="cv-preview__share" role="status">
+              <label class="cv-preview__label" for="share-link">Enlace (válido 7 días)</label>
+              <input id="share-link" class="cv-preview__share-input" type="url" readonly [value]="link" />
+              <div class="cv-preview__share-actions">
+                <button type="button" class="cv-preview__share-btn" (click)="copyShareLink()">
+                  {{ shareCopied() ? 'Copiado' : 'Copiar' }}
+                </button>
+                <a class="cv-preview__share-btn" [href]="link" target="_blank" rel="noopener">Abrir</a>
+              </div>
+            </div>
+          }
         </div>
     </div>
   </div>
