@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { SupabaseService } from '../../core/services/supabase.service';
@@ -18,11 +18,17 @@ describe('LoginComponent', () => {
             authInitialized$: of(true),
             user$: of(null),
             signInWithGoogle: vi.fn(),
+            signInWithPassword: vi.fn(),
+            sendPasswordSetupEmail: vi.fn(),
           },
         },
         {
           provide: Router,
-          useValue: { navigate: vi.fn() },
+          useValue: { navigate: vi.fn(), navigateByUrl: vi.fn() },
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { queryParamMap: convertToParamMap({}) } },
         },
       ],
     }).compileComponents();
