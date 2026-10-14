@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { LoginComponent } from './pages/login/login.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DashboardHome } from './pages/dashboard/dashboard-home/dashboard-home';
 import { ProfilePage } from './pages/dashboard/profile-page/profile-page';
@@ -10,6 +11,7 @@ import { CvPreviewPage } from './pages/dashboard/cv-preview/cv-preview-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [authGuard] },
   {
     path: 'dashboard',
     component: DashboardComponent,
