@@ -6,6 +6,21 @@ import { CV_LAYOUT } from '../constants/cv-layout.constants';
 })
 export class PdfExportService {
   async downloadElementAsPdf(element: HTMLElement, fileName: string): Promise<void> {
+    const pdf = await this.renderPdf(element);
+    pdf.save(`${this.safeFileName(fileName)}.pdf`);
+  }
+
+  /** Genera el PDF como Blob (para subirlo a Storage y compartir un enlace). */
+  async elementToPdfBlob(element: HTMLElement): Promise<Blob> {
+    const pdf = await this.renderPdf(element);
+    return pdf.output('blob');
+  }
+
+  safeFileName(fileName: string): string {
+    return fileName.replace(/\.pdf$/i, '').replace(/[^\w\-]+/g, '_') || 'CV';
+  }
+
+  private async renderPdf(element: HTMLElement) {
     const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
       import('html2canvas'),
       import('jspdf'),
@@ -36,7 +51,6 @@ export class PdfExportService {
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, pageHeight);
     }
 
-    const safeName = fileName.replace(/\.pdf$/i, '').replace(/[^\w\-]+/g, '_');
-    pdf.save(`${safeName}.pdf`);
+    return pdf;
   }
 }
