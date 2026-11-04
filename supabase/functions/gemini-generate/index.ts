@@ -5,6 +5,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const GEMINI_TIMEOUT_MS = 55_000;
+const OPENROUTER_TIMEOUT_MS = 85_000;
+const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+
 interface GenerateRequest {
   userPrompt?: string;
   systemPrompt?: string;
@@ -54,14 +58,16 @@ Deno.serve(async (req: Request) => {
           geminiBody.systemInstruction = { parts: [{ text: body.systemPrompt.trim() }] };
         }
 
+        // La clave va en cabecera (no en la URL) para que nunca aparezca en mensajes de error.
         const url =
-          `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+          `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
         const geminiRes = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiApiKey },
           body: JSON.stringify(geminiBody),
+          signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
         });
-        const geminiData = await geminiRes.json();
+        const geminiData = await readJson(geminiRes);
 
         if (!geminiRes.ok) {
           throw new Error(geminiData.error?.message ?? `Gemini API error (${geminiRes.status})`);
@@ -83,7 +89,7 @@ Deno.serve(async (req: Request) => {
           usageMetadata: geminiData.usageMetadata ?? null,
         });
       } catch (error) {
-        geminiError = error instanceof Error ? error.message : 'Unknown Gemini error';
+        geminiError = safeErrorMessage(error, 'Unknown Gemini error', [geminiApiKey, openRouterApiKey]);
       }
     }
 
@@ -99,7 +105,7 @@ Deno.serve(async (req: Request) => {
         ...(body.systemPrompt?.trim() ? [{ role: 'system', content: body.systemPrompt.trim() }] : []),
         { role: 'user', content: userPrompt },
       ];
-      const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const openRouterRes = await fetch(OPENROUTER_ENDPOINT, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${openRouterApiKey}`,
@@ -111,8 +117,9 @@ Deno.serve(async (req: Request) => {
           temperature,
           max_tokens: maxOutputTokens,
         }),
+        signal: AbortSignal.timeout(OPENROUTER_TIMEOUT_MS),
       });
-      const openRouterData = await openRouterRes.json();
+      const openRouterData = await readJson(openRouterRes);
 
       if (!openRouterRes.ok) {
         throw new Error(openRouterData.error?.message ?? `OpenRouter API error (${openRouterRes.status})`);
@@ -135,7 +142,7 @@ Deno.serve(async (req: Request) => {
         usageMetadata: openRouterData.usage ?? null,
       });
     } catch (error) {
-      const openRouterError = error instanceof Error ? error.message : 'Unknown OpenRouter error';
+      const openRouterError = safeErrorMessage(error, 'Unknown OpenRouter error', [geminiApiKey, openRouterApiKey]);
       return jsonResponse({
         error: geminiError
           ? `Gemini failed: ${geminiError}; OpenRouter fallback failed: ${openRouterError}`
@@ -143,7 +150,10 @@ Deno.serve(async (req: Request) => {
       }, 502);
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    const message = safeErrorMessage(error, 'Unknown error', [
+      Deno.env.get('GEMINI_API_KEY'),
+      Deno.env.get('OPENROUTER_API_KEY'),
+    ]);
     return jsonResponse({ error: message }, 500);
   }
 });
@@ -153,4 +163,28 @@ function jsonResponse(payload: unknown, status = 200): Response {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+/** Lee JSON sin romper si el proveedor devuelve HTML o texto (p. ej. un 503 de un proxy). */
+async function readJson(res: Response): Promise<any> {
+  const raw = await res.text();
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return { error: { message: `Non-JSON response (${res.status})` } };
+  }
+}
+
+/** Mensaje de error apto para el cliente: sin claves y con los timeouts legibles. */
+function safeErrorMessage(error: unknown, fallback: string, secrets: Array<string | undefined>): string {
+  let message: string;
+  if (error instanceof DOMException && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+    message = 'Request timed out';
+  } else {
+    message = error instanceof Error ? error.message : fallback;
+  }
+  for (const secret of secrets) {
+    if (secret) message = message.split(secret).join('[redacted]');
+  }
+  return message;
 }
