@@ -22,15 +22,6 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const apiKey = Deno.env.get('GEMINI_API_KEY');
-    if (!apiKey) {
-      return jsonResponse({ error: 'GEMINI_API_KEY not configured on server' }, 500);
-    }
-
-    const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.1-flash-lite';
-    const defaultTemperature = Number(Deno.env.get('GEMINI_TEMPERATURE') ?? '0.2');
-    const defaultMaxOutputTokens = Number(Deno.env.get('GEMINI_MAX_OUTPUT_TOKENS') ?? '16384');
-
     const body = (await req.json()) as GenerateRequest;
     const userPrompt = body.userPrompt?.trim();
 
@@ -38,49 +29,119 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'userPrompt is required' }, 400);
     }
 
-    const geminiBody: Record<string, unknown> = {
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        temperature: body.temperature ?? defaultTemperature,
-        maxOutputTokens: body.maxOutputTokens ?? defaultMaxOutputTokens,
-      },
-    };
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
 
-    if (body.systemPrompt?.trim()) {
-      geminiBody.systemInstruction = { parts: [{ text: body.systemPrompt.trim() }] };
+    if (!geminiApiKey && !openRouterApiKey) {
+      return jsonResponse({ error: 'No AI provider API key configured on server' }, 500);
     }
 
-    const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const defaultTemperature = Number(Deno.env.get('GEMINI_TEMPERATURE') ?? '0.2');
+    const defaultMaxOutputTokens = Number(Deno.env.get('GEMINI_MAX_OUTPUT_TOKENS') ?? '16384');
+    const temperature = body.temperature ?? defaultTemperature;
+    const maxOutputTokens = body.maxOutputTokens ?? defaultMaxOutputTokens;
+    let geminiError: string | null = null;
 
-    const geminiRes = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiBody),
-    });
+    if (geminiApiKey) {
+      try {
+        const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.1-flash-lite';
+        const geminiBody: Record<string, unknown> = {
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          generationConfig: { temperature, maxOutputTokens },
+        };
 
-    const geminiData = await geminiRes.json();
+        if (body.systemPrompt?.trim()) {
+          geminiBody.systemInstruction = { parts: [{ text: body.systemPrompt.trim() }] };
+        }
 
-    if (!geminiRes.ok) {
-      const message = geminiData.error?.message ?? `Gemini API error (${geminiRes.status})`;
-      return jsonResponse({ error: message }, geminiRes.status);
+        const url =
+          `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+        const geminiRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(geminiBody),
+        });
+        const geminiData = await geminiRes.json();
+
+        if (!geminiRes.ok) {
+          throw new Error(geminiData.error?.message ?? `Gemini API error (${geminiRes.status})`);
+        }
+
+        const text =
+          geminiData.candidates?.[0]?.content?.parts
+            ?.map((part: { text?: string }) => part.text ?? '')
+            .join('')
+            .trim() ?? '';
+
+        if (!text) {
+          throw new Error('Gemini response contained no text');
+        }
+
+        return jsonResponse({
+          text,
+          model: geminiData.modelVersion ?? model,
+          usageMetadata: geminiData.usageMetadata ?? null,
+        });
+      } catch (error) {
+        geminiError = error instanceof Error ? error.message : 'Unknown Gemini error';
+      }
     }
 
-    const text =
-      geminiData.candidates?.[0]?.content?.parts
-        ?.map((part: { text?: string }) => part.text ?? '')
-        .join('')
-        .trim() ?? '';
-
-    if (!text) {
-      return jsonResponse({ error: 'Gemini response contained no text' }, 502);
+    if (!openRouterApiKey) {
+      return jsonResponse({
+        error: `${geminiError ?? 'Gemini is not configured'}; OPENROUTER_API_KEY not configured on server`,
+      }, 502);
     }
 
-    return jsonResponse({
-      text,
-      model: geminiData.modelVersion ?? model,
-      usageMetadata: geminiData.usageMetadata ?? null,
-    });
+    try {
+      const model = Deno.env.get('OPENROUTER_MODEL') ?? 'openrouter/free';
+      const messages = [
+        ...(body.systemPrompt?.trim() ? [{ role: 'system', content: body.systemPrompt.trim() }] : []),
+        { role: 'user', content: userPrompt },
+      ];
+      const openRouterRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${openRouterApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature,
+          max_tokens: maxOutputTokens,
+        }),
+      });
+      const openRouterData = await openRouterRes.json();
+
+      if (!openRouterRes.ok) {
+        throw new Error(openRouterData.error?.message ?? `OpenRouter API error (${openRouterRes.status})`);
+      }
+
+      const content = openRouterData.choices?.[0]?.message?.content;
+      const text = (typeof content === 'string'
+        ? content
+        : Array.isArray(content)
+          ? content.map((part: { text?: string }) => part.text ?? '').join('')
+          : '').trim();
+
+      if (!text) {
+        throw new Error('OpenRouter response contained no text');
+      }
+
+      return jsonResponse({
+        text,
+        model: openRouterData.model ?? model,
+        usageMetadata: openRouterData.usage ?? null,
+      });
+    } catch (error) {
+      const openRouterError = error instanceof Error ? error.message : 'Unknown OpenRouter error';
+      return jsonResponse({
+        error: geminiError
+          ? `Gemini failed: ${geminiError}; OpenRouter fallback failed: ${openRouterError}`
+          : `OpenRouter failed: ${openRouterError}`,
+      }, 502);
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return jsonResponse({ error: message }, 500);

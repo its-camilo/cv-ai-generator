@@ -8,6 +8,8 @@
     "build": "ng build",
     "verify:gemini": "node scripts/verify-gemini.mjs",
     "secrets:gemini": "bash scripts/set-gemini-secrets.sh",
+    "secrets:ai": "bash scripts/set-gemini-secrets.sh",
+    "deploy:ai": "npx supabase functions deploy gemini-generate --project-ref pijeknfihtnyaqwwxqrm",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:layout": "vitest run src/app/core/utils/cv-page-tune.spec.ts",
