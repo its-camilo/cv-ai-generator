@@ -1,0 +1,89 @@
+# Mantiene vivos los proyectos Supabase gratuitos para que no se pausen
+# por inactividad (Supabase pausa proyectos Free con >7 días sin actividad).
+# Hace 2 lecturas pequeñas a la API REST (PostgREST) 3 veces al día.
+# Sin checkout, sin claves hardcodeadas: todo va por GitHub Secrets.
+name: Supabase keep-alive
+
+on:
+  schedule:
+    # 03:00, 11:00 y 19:00 UTC = 22:00, 06:00 y 14:00 hora de Bogotá.
+    - cron: '0 3,11,19 * * *'
+  workflow_dispatch: # permite probar a mano desde la pestaña Actions
+
+permissions:
+  contents: read
+
+jobs:
+  keep-alive-cv:
+    name: cv-ai-generator
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - name: Verificar secretos configurados
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Faltan los secretos SUPABASE_URL o SUPABASE_ANON_KEY. Créelos en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Ping perfiles_maestros (lectura pequeña)
+        run: |
+          set -euo pipefail
+          headers=$(mktemp)
+          http_code=$(curl -sS -o /dev/null -w '%{http_code}' -D "$headers" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Prefer: count=exact" \
+            "$SUPABASE_URL/rest/v1/perfiles_maestros?select=id&limit=1")
+          echo "perfiles_maestros → HTTP $http_code"
+          grep -i '^content-range:' "$headers" || true
+          [ "$http_code" = "200" ]
+
+      - name: Ping experiencias_maestras (lectura pequeña)
+        run: |
+          set -euo pipefail
+          headers=$(mktemp)
+          http_code=$(curl -sS -o /dev/null -w '%{http_code}' -D "$headers" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Prefer: count=exact" \
+            "$SUPABASE_URL/rest/v1/experiencias_maestras?select=id&limit=1")
+          echo "experiencias_maestras → HTTP $http_code"
+          grep -i '^content-range:' "$headers" || true
+          [ "$http_code" = "200" ]
+
+  keep-alive-fiore:
+    name: Creaciones Fiore
+    # DESACTIVADO: el proyecto está Unhealthy (20 nov 2026, "Conns Unavailable").
+    # El keep-alive solo mantiene vivo un proyecto sano; primero hay que
+    # reactivarlo/investigarlo. Cuando vuelva a Healthy: quitar esta línea
+    # y crear los secretos SUPABASE_URL_FIORE y SUPABASE_ANON_KEY_FIORE.
+    if: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL_FIORE }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_FIORE }}
+    steps:
+      - name: Verificar secretos configurados
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Faltan los secretos SUPABASE_URL_FIORE o SUPABASE_ANON_KEY_FIORE. Créelos en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      # Sin tabla conocida de Fiore: se consulta la raíz de PostgREST, que
+      # lista las tablas expuestas. Cuando se conozca una tabla pequeña del
+      # proyecto, cambiar por /rest/v1/<tabla>?select=id&limit=1 como arriba.
+      - name: Ping API de Fiore (raíz de PostgREST)
+        run: |
+          set -euo pipefail
+          http_code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/")
+          echo "fiore /rest/v1/ → HTTP $http_code"
+          [ "$http_code" = "200" ]
