@@ -1,5 +1,5 @@
 export function requireEnv(name: string): string {
-  const value = process.env[name]?.trim();
+  const value = process.env[name as keyof NodeJS.ProcessEnv]?.trim();
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }

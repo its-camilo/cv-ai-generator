@@ -15,7 +15,7 @@
     "test:layout": "vitest run src/app/core/utils/cv-page-tune.spec.ts",
     "test:e2e": "playwright test",
     "test:e2e:layout": "playwright test e2e/cv-layout.spec.ts",
-    "test:mcp": "vitest run api/lib/auth.test.ts",
+    "test:mcp": "vitest run mcp-server/lib/auth.test.ts",
     "test:mcp:endpoint": "node scripts/test-mcp-endpoint.mjs"
   },
   "private": true,
