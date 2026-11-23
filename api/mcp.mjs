@@ -303,8 +303,12 @@ function parseJsonField(raw, field) {
 function slugifyEmpresa(name) {
   return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40) || "Empresa";
 }
-function buildDefaultPdfFileName(empresaSlug) {
-  return `Camilo_Lagos_CV_${empresaSlug}`;
+function personNameSlug(nombreCompleto) {
+  const slug = nombreCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 48);
+  return slug || "CV";
+}
+function buildDefaultPdfFileName(empresaSlug, nombreCompleto) {
+  return `${personNameSlug(nombreCompleto ?? "")}_CV_${empresaSlug}`;
 }
 function splitNombreCompleto(nombreCompleto) {
   const parts = nombreCompleto.trim().split(/\s+/).filter(Boolean);
@@ -713,7 +717,7 @@ async function generateCvDraftForUser(supabase, userId, input, userMeta) {
     language,
     ofertaTexto: oferta,
     empresaSlug,
-    pdfFileName: buildDefaultPdfFileName(empresaSlug),
+    pdfFileName: buildDefaultPdfFileName(empresaSlug, perfil.nombre_completo),
     nombreLinea1: linea1,
     nombreLinea2: linea2,
     carrera: perfil.carrera ?? "",

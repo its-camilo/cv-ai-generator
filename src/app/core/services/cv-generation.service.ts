@@ -85,7 +85,7 @@ export class CvGenerationService {
         language,
         ofertaTexto: oferta,
         empresaSlug,
-        pdfFileName: buildDefaultPdfFileName(empresaSlug),
+        pdfFileName: buildDefaultPdfFileName(empresaSlug, perfil.nombre_completo),
         nombreLinea1: linea1,
         nombreLinea2: linea2,
         carrera: perfil.carrera ?? '',

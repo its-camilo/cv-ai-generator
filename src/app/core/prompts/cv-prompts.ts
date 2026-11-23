@@ -249,8 +249,19 @@ export function slugifyEmpresa(name: string): string {
     .slice(0, 40) || 'Empresa';
 }
 
-export function buildDefaultPdfFileName(empresaSlug: string): string {
-  return `Camilo_Lagos_CV_${empresaSlug}`;
+export function personNameSlug(nombreCompleto: string): string {
+  const slug = nombreCompleto
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 48);
+  return slug || 'CV';
+}
+
+export function buildDefaultPdfFileName(empresaSlug: string, nombreCompleto?: string): string {
+  return `${personNameSlug(nombreCompleto ?? '')}_CV_${empresaSlug}`;
 }
 
 export function splitNombreCompleto(nombreCompleto: string): { linea1: string; linea2: string } {
