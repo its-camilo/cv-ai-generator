@@ -1,11 +1,17 @@
-// mcp-server/vercel-entry.ts
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-
-// mcp-server/lib/auth.ts
-import { createHash } from "node:crypto";
-
-// mcp-server/lib/supabase-admin.ts
-import { createClient } from "@supabase/supabase-js";
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
 // mcp-server/lib/env.ts
 function requireEnv(name) {
@@ -21,9 +27,18 @@ function geminiDefaults() {
     maxOutputTokens: Number(process.env.GEMINI_MAX_OUTPUT_TOKENS ?? 16384)
   };
 }
+var init_env = __esm({
+  "mcp-server/lib/env.ts"() {
+    "use strict";
+  }
+});
 
 // mcp-server/lib/supabase-admin.ts
-var adminClient = null;
+var supabase_admin_exports = {};
+__export(supabase_admin_exports, {
+  getSupabaseAdmin: () => getSupabaseAdmin
+});
+import { createClient } from "@supabase/supabase-js";
 function getSupabaseAdmin() {
   if (!adminClient) {
     const url = requireEnv("SUPABASE_URL");
@@ -37,8 +52,21 @@ function getSupabaseAdmin() {
   }
   return adminClient;
 }
+var adminClient;
+var init_supabase_admin = __esm({
+  "mcp-server/lib/supabase-admin.ts"() {
+    "use strict";
+    init_env();
+    adminClient = null;
+  }
+});
+
+// mcp-server/vercel-entry.ts
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 
 // mcp-server/lib/auth.ts
+init_supabase_admin();
+import { createHash } from "node:crypto";
 function hashApiKey(rawKey) {
   return createHash("sha256").update(rawKey.trim()).digest("hex");
 }
@@ -65,6 +93,7 @@ async function authenticateMcpRequest(authorization) {
 }
 
 // mcp-server/lib/mcp-server-factory.ts
+init_supabase_admin();
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
@@ -577,6 +606,7 @@ function pageTuneStyleVars(tune) {
 }
 
 // mcp-server/lib/gemini-server.ts
+init_env();
 var GEMINI_FUNCTION = "gemini-generate";
 function isRetryable(message, status) {
   if (status === 429 || status === 503 || status === 502) return true;
@@ -859,6 +889,7 @@ function mapEducaciones(items) {
 }
 
 // mcp-server/lib/generation-lock.ts
+init_supabase_admin();
 var LOCK_TTL_MS = 20 * 60 * 1e3;
 var GenerationBusyError = class extends Error {
   constructor() {
@@ -1265,6 +1296,15 @@ async function sendWebResponse(webResponse, res) {
   res.send(buffer);
 }
 async function handler(req, res) {
+  try {
+    const { getSupabaseAdmin: getSupabaseAdmin2 } = await Promise.resolve().then(() => (init_supabase_admin(), supabase_admin_exports));
+    getSupabaseAdmin2();
+  } catch {
+    res.status(503).json({
+      error: "MCP server is not fully configured (missing SUPABASE_SERVICE_ROLE_KEY on Vercel)."
+    });
+    return;
+  }
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");

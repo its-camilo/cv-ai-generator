@@ -48,6 +48,16 @@ async function sendWebResponse(webResponse: Response, res: VercelResponse): Prom
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  try {
+    const { getSupabaseAdmin } = await import('./lib/supabase-admin.js');
+    getSupabaseAdmin();
+  } catch {
+    res.status(503).json({
+      error: 'MCP server is not fully configured (missing SUPABASE_SERVICE_ROLE_KEY on Vercel).',
+    });
+    return;
+  }
+
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
