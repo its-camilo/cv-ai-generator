@@ -70,15 +70,12 @@ jobs:
             exit 1
           fi
 
-      # Sin tabla conocida de Fiore: se consulta la raíz de PostgREST, que
-      # lista las tablas expuestas. Cuando se conozca una tabla pequeña del
-      # proyecto, cambiar por /rest/v1/<tabla>?select=id&limit=1 como arriba.
-      - name: Ping API de Fiore (raíz de PostgREST)
+      - name: Ping profiles (lectura pequeña)
         run: |
           set -euo pipefail
           http_code=$(curl -sS -o /dev/null -w '%{http_code}' \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            "$SUPABASE_URL/rest/v1/")
-          echo "fiore /rest/v1/ → HTTP $http_code"
+            "$SUPABASE_URL/rest/v1/profiles?select=id&limit=1")
+          echo "profiles → HTTP $http_code"
           [ "$http_code" = "200" ]
