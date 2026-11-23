@@ -14,7 +14,9 @@
     "test": "ng test",
     "test:layout": "vitest run src/app/core/utils/cv-page-tune.spec.ts",
     "test:e2e": "playwright test",
-    "test:e2e:layout": "playwright test e2e/cv-layout.spec.ts"
+    "test:e2e:layout": "playwright test e2e/cv-layout.spec.ts",
+    "test:mcp": "vitest run api/lib/auth.test.ts",
+    "test:mcp:endpoint": "node scripts/test-mcp-endpoint.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -26,10 +28,13 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@sparticuz/chromium": "^133.0.0",
     "@supabase/supabase-js": "^2.106.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "ogl": "^1.0.11",
+    "puppeteer-core": "^24.15.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -38,10 +43,12 @@
     "@angular/cli": "^21.2.13",
     "@angular/compiler-cli": "^21.2.0",
     "@playwright/test": "^1.60.0",
+    "@vercel/node": "^32.0.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "shadcn": "^4.8.3",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "zod": "^4.6.7"
   }
 }

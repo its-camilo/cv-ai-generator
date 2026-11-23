@@ -8,6 +8,7 @@ import { DashboardHome } from './pages/dashboard/dashboard-home/dashboard-home';
 import { ProfilePage } from './pages/dashboard/profile-page/profile-page';
 import { GenerateCvPage } from './pages/dashboard/generate-cv-page/generate-cv-page';
 import { CvPreviewPage } from './pages/dashboard/cv-preview/cv-preview-page';
+import { McpSettingsPage } from './pages/dashboard/mcp-settings/mcp-settings-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: 'profile', component: ProfilePage },
       { path: 'generate-cv', component: GenerateCvPage },
       { path: 'generate-cv/preview', component: CvPreviewPage },
+      { path: 'settings', component: McpSettingsPage },
       { path: 'perfil', redirectTo: 'profile', pathMatch: 'full' },
       { path: 'generar-cv', redirectTo: 'generate-cv', pathMatch: 'full' },
       { path: 'generar-cv/vista-previa', redirectTo: 'generate-cv/preview', pathMatch: 'full' },

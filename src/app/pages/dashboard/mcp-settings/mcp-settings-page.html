@@ -1,0 +1,91 @@
+<div class="mcp-settings">
+  <nav class="mcp-settings__back">
+    <a routerLink="/dashboard">← Volver al dashboard</a>
+  </nav>
+
+  <header class="mcp-settings__header">
+    <p class="mcp-settings__eyebrow">Integración para agentes</p>
+    <h2 class="mcp-settings__title">Clave API MCP</h2>
+    <p class="mcp-settings__lead">
+      Conecta Cursor, Claude Desktop u otro cliente MCP remoto para generar CVs sin usar el navegador.
+      Cada clave es personal e intransferible.
+    </p>
+  </header>
+
+  <section class="mcp-settings__panel" aria-labelledby="mcp-endpoint-heading">
+  <h3 id="mcp-endpoint-heading">Endpoint</h3>
+    <p class="mcp-settings__mono">{{ mcpEndpoint }}</p>
+    <p>Cabecera: <code>Authorization: Bearer &lt;tu_clave&gt;</code></p>
+  </section>
+
+  @if (newKey(); as created) {
+    <section class="mcp-settings__panel mcp-settings__panel--highlight" aria-live="polite">
+      <h3>Clave creada (cópiala ahora)</h3>
+      <p class="mcp-settings__warning">No volverá a mostrarse completa.</p>
+      <p class="mcp-settings__mono mcp-settings__mono--key">{{ created.apiKey }}</p>
+      <button type="button" class="mcp-settings__btn" (click)="copyNewKey()">
+        {{ copied() ? 'Copiada' : 'Copiar clave' }}
+      </button>
+    </section>
+  }
+
+  <section class="mcp-settings__panel" aria-labelledby="mcp-create-heading">
+    <h3 id="mcp-create-heading">Nueva clave</h3>
+    <label class="mcp-settings__label" for="mcp-label">Etiqueta (opcional)</label>
+    <input
+      id="mcp-label"
+      class="mcp-settings__input"
+      type="text"
+      [value]="label()"
+      (input)="updateLabel($any($event.target).value)"
+      placeholder="Ej. Cursor en el portátil"
+      maxlength="80"
+    />
+    <button
+      type="button"
+      class="mcp-settings__btn mcp-settings__btn--primary"
+      [disabled]="creating()"
+      (click)="createKey()"
+    >
+      {{ creating() ? 'Creando…' : 'Generar clave MCP' }}
+    </button>
+  </section>
+
+  @if (error()) {
+    <p class="mcp-settings__error" role="alert">{{ error() }}</p>
+  }
+
+  <section class="mcp-settings__panel" aria-labelledby="mcp-keys-heading">
+    <h3 id="mcp-keys-heading">Claves activas</h3>
+    @if (loading()) {
+      <p>Cargando…</p>
+    } @else if (keys().length === 0) {
+      <p>No tienes claves activas.</p>
+    } @else {
+      <ul class="mcp-settings__list">
+        @for (key of keys(); track key.id) {
+          <li class="mcp-settings__list-item">
+            <div>
+              <strong>{{ key.label || 'Sin etiqueta' }}</strong>
+              <span class="mcp-settings__prefix">{{ key.key_prefix }}…</span>
+              <span class="mcp-settings__meta">
+                Creada {{ key.created_at | date: 'short' }}
+                @if (key.last_used_at) {
+                  · Último uso {{ key.last_used_at | date: 'short' }}
+                }
+              </span>
+            </div>
+            <button type="button" class="mcp-settings__btn mcp-settings__btn--danger" (click)="revokeKey(key.id)">
+              Revocar
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="mcp-settings__panel">
+    <h3>Configuración en el cliente</h3>
+    <pre class="mcp-settings__code" aria-label="Ejemplo de configuración MCP"><code>{{ clientConfigExample }}</code></pre>
+  </section>
+</div>
