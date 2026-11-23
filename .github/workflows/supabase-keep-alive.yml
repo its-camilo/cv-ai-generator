@@ -57,11 +57,6 @@ jobs:
 
   keep-alive-fiore:
     name: Creaciones Fiore
-    # DESACTIVADO: el proyecto está Unhealthy (20 nov 2026, "Conns Unavailable").
-    # El keep-alive solo mantiene vivo un proyecto sano; primero hay que
-    # reactivarlo/investigarlo. Cuando vuelva a Healthy: quitar esta línea
-    # y crear los secretos SUPABASE_URL_FIORE y SUPABASE_ANON_KEY_FIORE.
-    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
