@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
-import { authenticateMcpRequest } from '../mcp-server/lib/auth.js';
-import { createMcpServerForUser } from '../mcp-server/lib/mcp-server-factory.js';
+import { authenticateMcpRequest } from './lib/auth.js';
+import { createMcpServerForUser } from './lib/mcp-server-factory.js';
 
 export const config = {
   maxDuration: 300,

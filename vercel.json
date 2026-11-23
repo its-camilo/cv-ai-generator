@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/mcp.ts": {
+    "api/mcp.mjs": {
       "maxDuration": 300,
       "memory": 1024
     }

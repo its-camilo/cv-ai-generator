@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prebuild": "node scripts/write-env.mjs",
+    "prebuild": "node scripts/write-env.mjs && node scripts/bundle-mcp.mjs",
+    "bundle:mcp": "node scripts/bundle-mcp.mjs",
     "build": "ng build",
     "verify:gemini": "node scripts/verify-gemini.mjs",
     "secrets:gemini": "bash scripts/set-gemini-secrets.sh",
@@ -44,6 +45,7 @@
     "@angular/compiler-cli": "^21.2.0",
     "@playwright/test": "^1.60.0",
     "@vercel/node": "^32.0.0",
+    "esbuild": "^0.28.2",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "shadcn": "^4.8.3",
