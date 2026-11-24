@@ -6,6 +6,7 @@ import {
   McpApiKeyRow,
   McpApiKeyService,
 } from '../../../core/services/mcp-api-key.service';
+import { formatSupabaseError } from '../../../core/utils/supabase-error';
 
 @Component({
   selector: 'app-mcp-settings-page',
@@ -49,7 +50,7 @@ export class McpSettingsPage {
       const rows = await this.mcpKeys.listActiveKeys();
       this.keys.set(rows);
     } catch (err) {
-      this.error.set(err instanceof Error ? err.message : 'No se pudieron cargar las claves MCP');
+      this.error.set(formatSupabaseError(err));
     } finally {
       this.loading.set(false);
     }
@@ -70,7 +71,7 @@ export class McpSettingsPage {
       this.label.set('');
       await this.refresh();
     } catch (err) {
-      this.error.set(err instanceof Error ? err.message : 'No se pudo crear la clave');
+      this.error.set(formatSupabaseError(err));
     } finally {
       this.creating.set(false);
     }
@@ -82,7 +83,7 @@ export class McpSettingsPage {
       await this.mcpKeys.revokeKey(id);
       await this.refresh();
     } catch (err) {
-      this.error.set(err instanceof Error ? err.message : 'No se pudo revocar la clave');
+      this.error.set(formatSupabaseError(err));
     }
   }
 

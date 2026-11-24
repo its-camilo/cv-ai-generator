@@ -16,4 +16,8 @@ describe('MCP auth helpers', () => {
     expect(a).not.toBe(c);
     expect(a).toHaveLength(64);
   });
+
+  it('trims bearer token before hashing (matches SQL resolve_mcp_api_key)', () => {
+    expect(hashApiKey('  cvai_trimmed  ')).toBe(hashApiKey('cvai_trimmed'));
+  });
 });

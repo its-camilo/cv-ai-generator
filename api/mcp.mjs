@@ -82,8 +82,8 @@ async function authenticateMcpRequest(authorization) {
   const { data: viaRpc, error: rpcError } = await admin.rpc("resolve_mcp_api_key", {
     p_raw_key: token
   });
-  if (!rpcError && viaRpc) {
-    return { userId: viaRpc };
+  if (!rpcError) {
+    return viaRpc ? { userId: viaRpc } : null;
   }
   const keyHash = hashApiKey(token);
   const { data: row, error } = await admin.from("mcp_api_keys").select("id, user_id").eq("key_hash", keyHash).is("revoked_at", null).maybeSingle();

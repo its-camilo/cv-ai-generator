@@ -1,5 +1,5 @@
 -- Per-user MCP API keys (hash only) + generation locks + CV metadata
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 create table if not exists public.mcp_api_keys (
   id uuid primary key default gen_random_uuid(),
@@ -68,7 +68,7 @@ create or replace function public.create_mcp_api_key(p_label text default null)
 returns jsonb
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_user_id uuid := auth.uid();
@@ -82,10 +82,11 @@ begin
     raise exception 'not authenticated' using errcode = '28000';
   end if;
   v_label := nullif(trim(coalesce(p_label, '')), '');
-  v_raw_key := 'cvai_' || replace(replace(replace(encode(gen_random_bytes(24), 'base64'), '/', '_'), '+', '-'), '=', '');
-  v_hash := encode(digest(v_raw_key, 'sha256'), 'hex');
+  v_raw_key := 'cvai_'
+    || replace(replace(replace(encode(extensions.gen_random_bytes(24), 'base64'), '/', '_'), '+', '-'), '=', '');
+  v_hash := encode(extensions.digest(v_raw_key, 'sha256'), 'hex');
   v_prefix := left(v_raw_key, 12);
-  insert into mcp_api_keys (user_id, key_hash, key_prefix, label)
+  insert into public.mcp_api_keys (user_id, key_hash, key_prefix, label)
   values (v_user_id, v_hash, v_prefix, v_label)
   returning id into v_id;
   return jsonb_build_object(

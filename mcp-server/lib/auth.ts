@@ -29,8 +29,8 @@ export async function authenticateMcpRequest(
     p_raw_key: token,
   });
 
-  if (!rpcError && viaRpc) {
-    return { userId: viaRpc as string };
+  if (!rpcError) {
+    return viaRpc ? { userId: viaRpc as string } : null;
   }
 
   const keyHash = hashApiKey(token);

@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { formatSupabaseError } from '../utils/supabase-error';
 import { SupabaseService } from './supabase.service';
 
 export interface McpApiKeyRow {
@@ -31,7 +32,7 @@ export class McpApiKeyService {
       .is('revoked_at', null)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) throw new Error(formatSupabaseError(error));
     return (data ?? []) as McpApiKeyRow[];
   }
 
@@ -39,7 +40,8 @@ export class McpApiKeyService {
     const { data, error } = await this.supabase.rpc('create_mcp_api_key', {
       p_label: label?.trim() || null,
     });
-    if (error) throw error;
+    if (error) throw new Error(formatSupabaseError(error));
+    if (!data) throw new Error('La función no devolvió datos de la clave.');
     const payload = data as {
       id: string;
       apiKey: string;
@@ -58,6 +60,6 @@ export class McpApiKeyService {
 
   async revokeKey(id: string): Promise<void> {
     const { error } = await this.supabase.rpc('revoke_mcp_api_key', { p_id: id });
-    if (error) throw error;
+    if (error) throw new Error(formatSupabaseError(error));
   }
 }
