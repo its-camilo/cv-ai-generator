@@ -1,12 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { start } from 'workflow/api';
 import { getSupabaseAdmin } from './supabase-admin.js';
-import { generateCvDraftForUser } from './cv-generation-server.js';
-import { withUserGenerationLock, GenerationBusyError } from './generation-lock.js';
-import { renderCvHtml } from './cv-html.js';
-import { htmlToPdfBuffer } from './cv-pdf.js';
-import { listRecentGenerations, uploadCvPdf } from './cv-storage.js';
+import { GenerationBusyError, hasActiveGenerationLock } from './generation-lock.js';
+import { listRecentGenerations } from './cv-storage.js';
 import { loadEducaciones, loadExperiencias, loadOrCreateProfile } from './profile-server.js';
+import { generateCvWorkflow } from '../workflows/generate-cv.js';
 
 export function createMcpServerForUser(userId: string): McpServer {
   const server = new McpServer({
@@ -20,7 +19,7 @@ export function createMcpServerForUser(userId: string): McpServer {
     'generate_cv',
     {
       description:
-        'Genera un CV (hoja de vida) personalizado para el texto COMPLETO de una convocatoria laboral, renderiza PDF, lo sube a Storage y devuelve enlace de descarga (mismo flujo que Generar enlace en la app).',
+        'Inicia en segundo plano la generación de un CV (hoja de vida) personalizado para el texto COMPLETO de una convocatoria laboral: renderiza PDF y lo sube a Storage (mismo flujo que Generar enlace en la app). Devuelve de inmediato { runId, status }; el CV terminado (con downloadUrl) aparece en list_recent_cvs.',
       inputSchema: {
         ofertaTexto: z
           .string()
@@ -38,26 +37,27 @@ export function createMcpServerForUser(userId: string): McpServer {
     },
     async ({ ofertaTexto, language, empresaSlugOverride }) => {
       try {
-        const result = await withUserGenerationLock(userId, async () => {
-          const draft = await generateCvDraftForUser(admin, userId, {
-            ofertaTexto,
-            language,
+        const oferta = ofertaTexto.trim();
+        if (!oferta) throw new Error('ofertaTexto es obligatorio (texto completo de la convocatoria).');
+        // Respuesta rápida si ya hay una generación en curso; el lock real se toma en el primer step.
+        if (await hasActiveGenerationLock(userId)) throw new GenerationBusyError();
+
+        const requestedAt = new Date().toISOString();
+        const run = await start(generateCvWorkflow, [
+          {
+            userId,
+            oferta,
+            language: language ?? 'es',
             empresaSlugOverride,
-          });
-          const html = renderCvHtml(draft);
-          const pdf = await htmlToPdfBuffer(html);
-          const uploaded = await uploadCvPdf(admin, userId, draft, pdf);
-          return {
-            downloadUrl: uploaded.signedUrl,
-            fileName: uploaded.downloadFileName,
-            storagePath: uploaded.storagePath,
-            language: draft.language,
-            empresaSlug: draft.empresaSlug,
-            pdfFileName: draft.pdfFileName,
-            sobreMi: draft.sobreMi,
-            habilidadesLineas: draft.habilidadesLineas,
-          };
-        });
+          },
+        ]);
+        const result = {
+          runId: run.runId,
+          status: await run.status,
+          requestedAt,
+          message:
+            'Generación iniciada en segundo plano. Consulta list_recent_cvs: cuando aparezca un CV con createdAt posterior a requestedAt, la generación terminó y trae su downloadUrl.',
+        };
 
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],

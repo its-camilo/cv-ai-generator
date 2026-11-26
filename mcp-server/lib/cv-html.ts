@@ -1,13 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type { GeneratedCvDraft } from '../../src/app/core/models/cv.models.js';
 import { pageTuneStyleVars } from '../../src/app/core/utils/cv-page-tune.js';
 import { sanitizeEducationNota } from '../../src/app/core/utils/cv-validation.js';
+import { CV_DOCUMENT_CSS } from './cv-document-css.generated.js';
 
-const cvCss = readFileSync(
-  join(process.cwd(), 'src/app/pages/dashboard/cv-preview/cv-document/cv-document.css'),
-  'utf8',
-).replace(':host { display: block; }', '');
+const cvCss = CV_DOCUMENT_CSS.replace(':host { display: block; }', '');
 
 function escapeHtml(text: string): string {
   return text

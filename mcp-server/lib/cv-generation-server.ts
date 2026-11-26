@@ -25,6 +25,7 @@ import {
   validateSobreMi,
 } from '../../src/app/core/utils/cv-validation.js';
 import { generateContentWithRetry } from './gemini-server.js';
+import type { EducacionMaestra, ExperienciaMaestra, PerfilMaestro } from '../../src/app/core/models/profile.models.js';
 import { loadEducaciones, loadExperiencias, loadOrCreateProfile } from './profile-server.js';
 
 export interface GenerateCvInput {
@@ -33,40 +34,40 @@ export interface GenerateCvInput {
   empresaSlugOverride?: string;
 }
 
-export async function generateCvDraftForUser(
+export interface GenerationSources {
+  perfil: PerfilMaestro;
+  experiencias: ExperienciaMaestra[];
+  educaciones: EducacionMaestra[];
+}
+
+/** Fase 1: perfil maestro, experiencias y educaciones del usuario. */
+export async function loadGenerationSources(
   supabase: SupabaseClient,
   userId: string,
-  input: GenerateCvInput,
   userMeta?: { email?: string | null; fullName?: string | null },
-): Promise<GeneratedCvDraft> {
-  const language = input.language ?? 'es';
-  const oferta = input.ofertaTexto.trim();
-  if (!oferta) throw new Error('ofertaTexto es obligatorio (texto completo de la convocatoria).');
-
+): Promise<GenerationSources> {
   const perfil = await loadOrCreateProfile(supabase, userId, userMeta?.email, userMeta?.fullName);
   const [experiencias, educaciones] = await Promise.all([
     loadExperiencias(supabase, perfil.id),
     loadEducaciones(supabase, perfil.id),
   ]);
+  return { perfil, experiencias, educaciones };
+}
 
-  const empresaSlug =
-    input.empresaSlugOverride?.trim() ||
-    (await inferEmpresaSlug(supabase, oferta));
-
-  const sobreMi = await generateSobreMiWithRetry(
-    supabase,
-    language,
-    perfil.sobre_mi_largo ?? '',
-    perfil.carrera ?? '',
-    oferta,
-  );
-
-  const habilidadesLineas = await generateHabilidadesWithRetry(
-    supabase,
-    language,
-    perfil.habilidades_largo ?? '',
-    oferta,
-  );
+/** Fase 5: arma el borrador, asegura idioma, normaliza secciones y calcula pageTune. */
+export async function buildLocalizedDraft(
+  supabase: SupabaseClient,
+  sources: GenerationSources,
+  input: {
+    language: CvLanguage;
+    oferta: string;
+    empresaSlug: string;
+    sobreMi: string;
+    habilidadesLineas: string[];
+  },
+): Promise<GeneratedCvDraft> {
+  const { perfil, experiencias, educaciones } = sources;
+  const { language, oferta, empresaSlug, sobreMi, habilidadesLineas } = input;
 
   const initialSobreMi = validateSobreMi(sobreMi).valid ? sobreMi : fitSobreMiToLayout(sobreMi);
   const initialHabilidades = validateHabilidadesLineas(habilidadesLineas).valid
@@ -102,14 +103,16 @@ export async function generateCvDraftForUser(
   return draft;
 }
 
-async function inferEmpresaSlug(supabase: SupabaseClient, oferta: string): Promise<string> {
+/** Fase 2: infiere el slug de empresa (1 llamada a Gemini). */
+export async function inferEmpresaSlug(supabase: SupabaseClient, oferta: string): Promise<string> {
   const { system, user } = empresaPrompt(oferta, 'es');
   const raw = await generateContentWithRetry(supabase, user, { systemPrompt: system, temperature: 0.1 });
   const empresa = parseJsonField<string>(raw, 'empresa');
   return slugifyEmpresa(empresa);
 }
 
-async function generateSobreMiWithRetry(
+/** Fase 3: sobreMi con hasta CV_LAYOUT.validationMaxAttempts reintentos de validación. */
+export async function generateSobreMiWithRetry(
   supabase: SupabaseClient,
   language: CvLanguage,
   inventario: string,
@@ -151,7 +154,8 @@ async function generateSobreMiWithRetry(
   return validateSobreMi(final).valid ? final : fitSobreMiToLayout(final);
 }
 
-async function generateHabilidadesWithRetry(
+/** Fase 4: habilidades con hasta CV_LAYOUT.validationMaxAttempts reintentos de validación. */
+export async function generateHabilidadesWithRetry(
   supabase: SupabaseClient,
   language: CvLanguage,
   inventario: string,
@@ -297,7 +301,7 @@ async function generateHabilidades(
 }
 
 function mapExperiencias(
-  items: Awaited<ReturnType<typeof loadExperiencias>>,
+  items: ExperienciaMaestra[],
   language: CvLanguage,
 ): CvExperienceItem[] {
   const present = presentLabel(language);
@@ -311,7 +315,7 @@ function mapExperiencias(
 }
 
 function mapEducaciones(
-  items: Awaited<ReturnType<typeof loadEducaciones>>,
+  items: EducacionMaestra[],
 ): CvEducationItem[] {
   return items.map((item) => ({
     lugar: item.lugar,

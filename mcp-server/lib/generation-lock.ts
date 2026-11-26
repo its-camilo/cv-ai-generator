@@ -9,7 +9,8 @@ export class GenerationBusyError extends Error {
   }
 }
 
-export async function withUserGenerationLock<T>(userId: string, fn: () => Promise<T>): Promise<T> {
+/** Inserta el lock del usuario (TTL 20 min). Lanza GenerationBusyError si hay otro vigente. */
+export async function acquireUserGenerationLock(userId: string): Promise<void> {
   const admin = getSupabaseAdmin();
   const now = new Date();
   const expires = new Date(now.getTime() + LOCK_TTL_MS);
@@ -43,10 +44,20 @@ export async function withUserGenerationLock<T>(userId: string, fn: () => Promis
       throw insertError;
     }
   }
+}
 
-  try {
-    return await fn();
-  } finally {
-    await admin.from('mcp_generation_locks').delete().eq('user_id', userId);
-  }
+export async function releaseUserGenerationLock(userId: string): Promise<void> {
+  const admin = getSupabaseAdmin();
+  await admin.from('mcp_generation_locks').delete().eq('user_id', userId);
+}
+
+/** Lectura sin efectos: true si el usuario tiene un lock vigente (no expirado). */
+export async function hasActiveGenerationLock(userId: string): Promise<boolean> {
+  const admin = getSupabaseAdmin();
+  const { data } = await admin
+    .from('mcp_generation_locks')
+    .select('expires_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+  return !!data && new Date(data.expires_at) > new Date();
 }

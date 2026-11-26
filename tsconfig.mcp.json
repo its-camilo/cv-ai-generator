@@ -1,0 +1,10 @@
+/* Typecheck del servidor MCP (Nitro + Workflow SDK). No emite: Nitro hace el bundle. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "plugins": [{ "name": "workflow" }]
+  },
+  "include": ["mcp-server/**/*.ts", "nitro.config.ts"]
+}

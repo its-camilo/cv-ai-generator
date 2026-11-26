@@ -1,7 +1,7 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
-export async function htmlToPdfBuffer(html: string): Promise<Buffer> {
+export async function htmlToPdfBuffer(html: string): Promise<Uint8Array> {
   const executablePath = await chromium.executablePath();
   const browser = await puppeteer.launch({
     args: chromium.args,
@@ -18,7 +18,7 @@ export async function htmlToPdfBuffer(html: string): Promise<Buffer> {
       printBackground: true,
       margin: { top: '0', right: '0', bottom: '0', left: '0' },
     });
-    return Buffer.from(pdf);
+    return new Uint8Array(pdf);
   } finally {
     await browser.close();
   }

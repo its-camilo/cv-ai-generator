@@ -4,9 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prebuild": "node scripts/write-env.mjs && node scripts/bundle-mcp.mjs",
-    "bundle:mcp": "node scripts/bundle-mcp.mjs",
-    "build": "ng build",
+    "prebuild": "node scripts/write-env.mjs && node scripts/embed-cv-css.mjs",
+    "build": "ng build && nitro build",
+    "build:mcp": "node scripts/embed-cv-css.mjs && nitro build",
     "verify:gemini": "node scripts/verify-gemini.mjs",
     "secrets:gemini": "bash scripts/set-gemini-secrets.sh",
     "secrets:ai": "bash scripts/set-gemini-secrets.sh",
@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:layout": "playwright test e2e/cv-layout.spec.ts",
     "test:mcp": "vitest run mcp-server/lib/auth.test.ts",
+    "typecheck": "node scripts/embed-cv-css.mjs && tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.mcp.json --noEmit",
     "test:mcp:endpoint": "node scripts/test-mcp-endpoint.mjs"
   },
   "private": true,
@@ -37,16 +38,16 @@
     "ogl": "^1.0.11",
     "puppeteer-core": "^24.15.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "workflow": "^5.8.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.13",
     "@angular/cli": "^21.2.13",
     "@angular/compiler-cli": "^21.2.0",
     "@playwright/test": "^1.60.0",
-    "@vercel/node": "^32.0.0",
-    "esbuild": "^0.28.2",
     "jsdom": "^28.0.0",
+    "nitro": "^3.0.261103-rc",
     "prettier": "^3.8.1",
     "shadcn": "^4.8.3",
     "typescript": "~5.9.2",

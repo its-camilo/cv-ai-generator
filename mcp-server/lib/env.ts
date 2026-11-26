@@ -8,7 +8,7 @@ export function requireEnv(name: string): string {
 
 export function geminiDefaults() {
   return {
-    temperature: Number(process.env.GEMINI_TEMPERATURE ?? 0.2),
-    maxOutputTokens: Number(process.env.GEMINI_MAX_OUTPUT_TOKENS ?? 16_384),
+    temperature: Number(process.env['GEMINI_TEMPERATURE'] ?? 0.2),
+    maxOutputTokens: Number(process.env['GEMINI_MAX_OUTPUT_TOKENS'] ?? 16_384),
   };
 }

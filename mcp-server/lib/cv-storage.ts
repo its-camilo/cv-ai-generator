@@ -12,7 +12,7 @@ export async function uploadCvPdf(
   supabase: SupabaseClient,
   userId: string,
   draft: GeneratedCvDraft,
-  pdf: Buffer,
+  pdf: Uint8Array,
 ): Promise<{ signedUrl: string; storagePath: string; downloadFileName: string }> {
   const safe = safeFileName(draft.pdfFileName);
   const storagePath = `${userId}/${safe}-${Date.now()}.pdf`;

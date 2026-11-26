@@ -55,11 +55,15 @@ Ejemplo en Cursor / cliente MCP:
 
 | Tool | Entrada principal | Salida |
 |------|-------------------|--------|
-| `generate_cv` | `ofertaTexto` (texto **completo** de la oferta), opcional `language` (`es` \| `en`), `empresaSlugOverride` | JSON con `downloadUrl`, `fileName`, `sobreMi`, `habilidadesLineas`, etc. |
+| `generate_cv` | `ofertaTexto` (texto **completo** de la oferta), opcional `language` (`es` \| `en`), `empresaSlugOverride` | Respuesta inmediata `{ runId, status, requestedAt }`; la generación corre en segundo plano |
 | `list_recent_cvs` | opcional `limit` (1–25) | Lista de CVs recientes con enlaces firmados |
 | `get_base_profile` | — | Perfil maestro, experiencia y educación |
 
+`generate_cv` es asíncrono: inicia un [Vercel Workflow](https://vercel.com/docs/workflows) (`mcp-server/workflows/generate-cv.ts`) cuyos pasos (perfil, empresa, sobre mí, habilidades, idioma, HTML, PDF, subida) se ejecutan cada uno con su propio presupuesto de duración. Para saber cuándo terminó, consulta `list_recent_cvs`: el CV listo aparece con `createdAt` posterior a `requestedAt` y trae su `downloadUrl`.
+
 Las generaciones se serializan **una por usuario**; si la IA está saturada, el servidor reintenta con backoff.
+
+El servidor MCP se compila con [Nitro](https://nitro.build) (`nitro.config.ts`, módulo `workflow/nitro`) a `.vercel/output` junto con la app Angular. En Vercel debe estar activado **Settings → Environment Variables → Enable access to System Environment Variables**; sin `VERCEL_DEPLOYMENT_ID` los workflows caen al Local World y fallan.
 
 ### Variables de entorno del servidor (Vercel)
 
@@ -76,7 +80,8 @@ Pruebas locales: `npm run test:mcp` y `npm run test:mcp:endpoint` (sin clave deb
 | Comando | Descripción |
 |---------|-------------|
 | `npm start` | Servidor de desarrollo |
-| `npm run build` | Build de producción |
+| `npm run build` | Build de producción (Angular + Nitro → `.vercel/output`) |
+| `npm run typecheck` | Typecheck de la app y del servidor MCP |
 | `npm test` | Tests unitarios (Vitest) |
 | `npm run test:mcp` | Tests de auth MCP |
 | `npm run test:mcp:endpoint` | Smoke test HTTP del endpoint |

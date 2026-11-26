@@ -65,3 +65,5 @@ credentials.json
 Thumbs.db
 .vercel
 .cursor/debug-*.log
+/mcp-server/lib/cv-document-css.generated.ts
+/.swc
